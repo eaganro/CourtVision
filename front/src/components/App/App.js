@@ -286,7 +286,7 @@ export default function App() {
     console.log(awayPlaytimes);
     console.log(homePlaytimes);
     setAwayPlayerTimeline(awayPlaytimes);
-    setHomePlayerTimeline(homePlaytimes)
+    setHomePlayerTimeline(homePlaytimes);
 
 
 

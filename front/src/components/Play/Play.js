@@ -59,18 +59,18 @@ export default function Play({ awayPlayers, homePlayers, scoreTimeline, awayPlay
     let y2 = t.scoreDiff * -250 / maxY;
     starty = y2;
     return ([
-      <line x1={100 + x1} y1={250 + y1} x2={100 + x2} y2={250 + y1} style={{"stroke":'rgb(255,0,0)', "stroke-width":2}} />,
-      <line x1={100 + x2} y1={250 + y1} x2={100 + x2} y2={250 + y2} style={{"stroke":'rgb(255,0,0)', "stroke-width":2}} />
+      <line x1={100 + x1} y1={250 + y1} x2={100 + x2} y2={250 + y1} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />,
+      <line x1={100 + x2} y1={250 + y1} x2={100 + x2} y2={250 + y2} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />
     ])
   }).flat();
 
-  timeline.push(<line x1={100 + startx} y1={250 + starty} x2={100 + 350 * 4} y2={250 + starty} style={{"stroke":'rgb(255,0,0)', "stroke-width":2}} />)
-  timeline.unshift(<line x1={0} y1={250} x2={1500} y2={250} style={{"stroke":'black', "stroke-width":1}} />)
-  // timeline.unshift(<line x1={100} y1={10} x2={100} y2={490} style={{"stroke":'black', "stroke-width":1}} />)
-  timeline.unshift(<line x1={100 + 350} y1={10} x2={100 + 350} y2={490} style={{"stroke":'black', "stroke-width":1}} />)
-  timeline.unshift(<line x1={100 + 350 * 2} y1={10} x2={100 + 350 * 2} y2={490} style={{"stroke":'black', "stroke-width":1}} />)
-  timeline.unshift(<line x1={100 + 350 * 3} y1={10} x2={100 + 350 * 3} y2={490} style={{"stroke":'black', "stroke-width":1}} />)
-  // timeline.unshift(<line x1={100 + 350 * 4} y1={10} x2={100 + 350 * 4} y2={490} style={{"stroke":'black', "stroke-width":1}} />)
+  timeline.push(<line x1={100 + startx} y1={250 + starty} x2={100 + 350 * 4} y2={250 + starty} style={{ stroke: 'rgb(255,0,0)', strokeWidth:2 }} />)
+  timeline.unshift(<line x1={0} y1={250} x2={1500} y2={250} style={{ stroke: 'black', strokeWidth:1 }} />)
+  // timeline.unshift(<line x1={100} y1={10} x2={100} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
+  timeline.unshift(<line x1={100 + 350} y1={10} x2={100 + 350} y2={490} style={{ stroke:'black', strokeWidth:1 }} />)
+  timeline.unshift(<line x1={100 + 350 * 2} y1={10} x2={100 + 350 * 2} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
+  timeline.unshift(<line x1={100 + 350 * 3} y1={10} x2={100 + 350 * 3} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
+  // timeline.unshift(<line x1={100 + 350 * 4} y1={10} x2={100 + 350 * 4} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
 
   return (
     <div className='play'>

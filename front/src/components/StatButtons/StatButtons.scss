@@ -1,0 +1,77 @@
+.statButtons {
+  display: flex;
+  justify-content: center;
+  margin-top: 200px;
+  margin-bottom: 100px;
+}
+
+.buttonGroup {
+  margin-right: 20px;
+}
+
+.statCheck {
+  width: 10px;
+  height: 10px;
+  border: 2px solid;
+  display: inline-block;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.point {
+  border-color: rgb(255, 215, 0);
+  background-color: rgb(255, 215, 0);
+  &:hover {
+    background-color: rgba(255, 215, 0, 0.5);
+  }
+}
+.miss {
+  border-color: rgb(165, 42, 42);
+  background-color: rgb(165, 42, 42);
+  &:hover {
+    background-color: rgba(165, 42, 42, 0.5);
+  }
+}
+.rebound {
+  border-color: rgb(0, 0, 255);
+  background-color: rgb(0, 0, 255);
+  &:hover {
+    background-color: rgba(0, 0, 255, 0.5);
+  }
+}
+.assist {
+  border-color: rgb(0, 128, 0);
+  background-color: rgb(0, 128, 0);
+  &:hover {
+    background-color: rgba(0, 128, 0, 0.5);
+  }
+}
+.turnover {
+  border-color: rgb(255, 0, 0);
+  background-color: rgb(255, 0, 0);
+  &:hover {
+    background-color: rgba(255, 0, 0, 0.5);
+  }
+}
+.block {
+  border-color: rgb(128, 0, 128);
+  background-color: rgb(128, 0, 128);
+  &:hover {
+    background-color: rgba(128, 0, 128, 0.5);
+  }
+}
+.steal {
+  border-color: rgb(255, 192, 203);
+  background-color: rgb(255, 192, 203);
+  &:hover {
+    background-color: rgba(255, 192, 203, 0.5);
+  }
+}
+.foul {
+  border-color: rgb(0, 0, 0);
+  background-color: rgb(0, 0, 0);
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
