@@ -18,22 +18,27 @@ export default function App() {
 
   const [awayActions, setAwayActions] = useState([]);
   const [homeActions, setHomeActions] = useState([]);
+
+  const [allActions, setAllActions] = useState([]);
+
   const [scoreTimeline, setScoreTimeline] = useState([]);
   const [homePlayerTimeline, setHomePlayerTimeline] = useState([]);
   const [awayPlayerTimeline, setAwayPlayerTimeline] = useState([]);
 
 
 
+  const [statOn, setStatOn] = useState([true, false, true, true, false, false, false, false]);
+
+
+
   useEffect(() => {
     fetch(`/games?date=${date}`).then(r =>  {
       if (r.status === 404) {
-        console.log('eher');
         return [];
       } else {
         return r.json()
       }
     }).then(gamesData => {
-      console.log(gamesData);
       setGames(gamesData);
     });
   }, [date]);
@@ -44,7 +49,6 @@ export default function App() {
     }).then(d => {
       const boxData = d[0];
       setBox(boxData);
-      console.log(boxData)
       setAwayTeamId(boxData.awayTeamId);
       setHomeTeamId(boxData.homeTeamId);
 
@@ -56,7 +60,7 @@ export default function App() {
 
   useEffect(() => {
     processPlayData(playByPlay);
-  }, [awayTeamId]);
+  }, [playByPlay, statOn]);
 
   const changeDate = (e) => {
     setDate(e.target.value);
@@ -70,7 +74,6 @@ export default function App() {
     if (data.length === 0) {
       return [];
     }
-    console.log(awayTeamId, data)
     let awayPlayers = {
 
     };
@@ -154,11 +157,6 @@ export default function App() {
     //   });
     // });
 
-    console.log(data.filter(a => a.actionType === 'Substitution'));
-    console.log(data.filter(a => a.playerName === 'Niang'));
-
-    console.log(awayPlaytimes);
-
     let currentQ = 1;
     data.forEach(a => {
 
@@ -180,7 +178,6 @@ export default function App() {
             }
           });
           currentQ = a.period;
-          console.log(currentQ);
         }
         if (a.actionType === 'Substitution') {
           let startName = a.description.indexOf('SUB:') + 5;
@@ -235,7 +232,6 @@ export default function App() {
             }
           });
           currentQ = a.period;
-          console.log(currentQ);
         }
         if (a.actionType === 'Substitution') {
           let startName = a.description.indexOf('SUB:') + 5;
@@ -283,14 +279,11 @@ export default function App() {
       }
       awayPlaytimes[player] = awayPlaytimes[player].times;
     });
-    console.log(awayPlaytimes);
-    console.log(homePlaytimes);
     setAwayPlayerTimeline(awayPlaytimes);
     setHomePlayerTimeline(homePlaytimes);
 
 
 
-    console.log(scoreTimeline);
     setScoreTimeline(scoreTimeline);
 
     awayAssistActions.forEach(a => {
@@ -306,6 +299,7 @@ export default function App() {
         clock: a.clock,
         description: a.description.slice(startName, -1),
         actionId: a.actionId + 'a',
+        actionNumber: a.actionNumber,
         teamId: a.teamId,
         scoreHome: a.scoreHome,
         scoreAway: a.scoreAway,
@@ -329,6 +323,7 @@ export default function App() {
         clock: a.clock,
         description: a.description.slice(startName, -1),
         actionId: a.actionId + 'a',
+        actionNumber: a.actionNumber,
         teamId: a.teamId,
         scoreHome: a.scoreHome,
         scoreAway: a.scoreAway,
@@ -339,10 +334,73 @@ export default function App() {
       })
     });
 
+    console.log('x', awayPlayers);
+    let allAct = [];
+
+    Object.entries(awayPlayers).forEach(([k, v]) => {
+      allAct = [...allAct, ...v];
+      let filterPlayer = [];
+      for (let pI = 0; pI < v.length; pI += 1) {
+        let a = v[pI];
+        if (a.description.includes('PTS') && statOn[0]) {
+          filterPlayer.push(a);
+        } else if (a.description.includes('MISS') && statOn[1]) {
+          filterPlayer.push(a);
+        } else if (a.description.includes('REBOUND') && statOn[2]) {
+          filterPlayer.push(a);
+        } else if (a.actionType === 'Assist' && statOn[3]) {
+          filterPlayer.push(a);
+        } else if (a.actionType === 'Turnover' && statOn[4]) {
+          filterPlayer.push(a);
+        } else if (a.description.includes('BLK') && statOn[5]) {
+          filterPlayer.push(a);
+        } else if (a.description.includes('STL') && statOn[6]) {
+          filterPlayer.push(a);
+        } else if (a.actionType === 'Foul' && statOn[7]) {
+          filterPlayer.push(a);
+        } 
+      }
+      awayPlayers[k] = filterPlayer;
+    });
+    Object.entries(homePlayers).forEach(([k, v]) => {
+      allAct = [...allAct, ...v];
+      let filterPlayer = [];
+      for (let pI = 0; pI < v.length; pI += 1) {
+        let a = v[pI];
+        if (a.description.includes('PTS') && statOn[0]) {
+          filterPlayer.push(a);
+        } else if (a.description.includes('MISS') && statOn[1]) {
+          filterPlayer.push(a);
+        } else if (a.description.includes('REBOUND') && statOn[2]) {
+          filterPlayer.push(a);
+        } else if (a.actionType === 'Assist' && statOn[3]) {
+          filterPlayer.push(a);
+        } else if (a.actionType === 'Turnover' && statOn[4]) {
+          filterPlayer.push(a);
+        } else if (a.description.includes('BLK') && statOn[5]) {
+          filterPlayer.push(a);
+        } else if (a.description.includes('STL') && statOn[6]) {
+          filterPlayer.push(a);
+        } else if (a.actionType === 'Foul' && statOn[7]) {
+          filterPlayer.push(a);
+        } 
+      }
+      homePlayers[k] = filterPlayer;
+    });
     console.log(awayPlayers);
 
+    allAct.sort((a, b) => a.actionNumber - b.actionNumber);
+    console.log(allAct)
+
+    setAllActions(allAct);
     setAwayActions(awayPlayers);
     setHomeActions(homePlayers);
+  }
+
+  const changeStatOn = (index) => {
+    const statOnNew = statOn.slice();
+    statOnNew[index] = !statOnNew[index];
+    setStatOn(statOnNew);
   }
 
   return (
@@ -351,10 +409,11 @@ export default function App() {
       <Play 
         awayPlayers={awayActions}
         homePlayers={homeActions}
+        allActions={allActions}
         scoreTimeline={scoreTimeline}
         awayPlayerTimeline={awayPlayerTimeline}
         homePlayerTimeline={homePlayerTimeline}></Play>
-        <StatButtons></StatButtons>
+      <StatButtons statOn={statOn} changeStatOn={changeStatOn}></StatButtons>
       <Boxscore box={box}></Boxscore>
     </div>
   );

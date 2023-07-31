@@ -1,7 +1,7 @@
 import './Player.scss';
-export default function Player({ actions, timeline }) {
+export default function Player({ actions, timeline, name }) {
 
-  const playerName = actions[0].playerNameI;
+  const playerName = name;
 
   const dotActions = {
     'Made Shot': 1,
@@ -35,15 +35,15 @@ export default function Player({ actions, timeline }) {
       color = 'black';
     } 
     return (
-      <div key={a.actionId} className="dot" style={{left: `${pos}px`, backgroundColor: color}}></div>
+      <div key={a.actionId} className="dot" style={{ left: `${pos}px`, backgroundColor: color }}></div>
     )
   });
 
-  const playTimeLines = timeline.map(t => {
+  const playTimeLines = timeline.map((t, i) => {
     let x1 = 1400 * (t.start / (12 * 60 * 4));
     let x2 = 1400 * (t.end / (12 * 60 * 4));
     x2 = isNaN(x2) ? x1 : x2; 
-    return <line x1={x1} y1={12} x2={x2} y2={12} style={{"stroke":'rgb(0,0,255)', "stroke-width":1}} />
+    return <line key={i} x1={x1} y1={12} x2={x2} y2={12} style={{ stroke: 'rgb(0,0,255)', strokeWidth: 1 }} />
   });
 
   return (
