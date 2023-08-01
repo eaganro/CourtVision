@@ -1,8 +1,13 @@
+import { useState } from 'react';
+
 import Player from './Player/Player';
 
 import './Play.scss';
 
 export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeline, awayPlayerTimeline, homePlayerTimeline }) {
+
+  const [descriptionArray, setDescriptionArray] = useState([]);
+
 
   const playtimes = {};
   Object.keys(awayPlayers).forEach(player => {
@@ -73,6 +78,8 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
   timeline.unshift(<line key={'q3'} x1={100 + 350 * 3} y1={10} x2={100 + 350 * 3} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
   // timeline.unshift(<line x1={100 + 350 * 4} y1={10} x2={100 + 350 * 4} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
 
+  const descriptionList = descriptionArray.map(a => (<div>{a.description} - {a.clock}</div>));
+
   let showMouse = true;
   const mouseOver = (e) => {
     if (showMouse) {
@@ -82,18 +89,29 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
       }
       let pos = e.clientX - el.offsetLeft - 100;
 
-      let a = allActions[0];
+      let a = 0;
 
       let goneOver = false;
+      let sameTime = 1;
       for (let i = 1; i < allActions.length && goneOver === false; i += 1) {
-        const actionPos = (((a.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(a.clock)) / (4 * 12 * 60)) * (350 * 4);
+        const actionPos = (((allActions[i].period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (350 * 4);
         if (actionPos > pos) {
           goneOver = true;
         } else {
-          a = allActions[i];
+          if (allActions[a].clock === allActions[i].clock) {
+            sameTime += 1;
+          } else {
+            sameTime = 1;
+          }
+          a = i;
         }
       }
-      console.log(a.description);
+      const hoverActions = [];
+      for (let i = 0; i < sameTime; i += 1) {
+        hoverActions.push(allActions[a - i]);
+      }
+      console.log(hoverActions.map(a => a.description));
+      setDescriptionArray(hoverActions);
 
 
       showMouse = false;
@@ -103,7 +121,7 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
 
   return (
     <div onMouseMove={mouseOver} className='play'>
-      
+      <div>{descriptionList}</div>
       <svg height="500" width="1500" className='line'>
         {timeline}
       </svg>

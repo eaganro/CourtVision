@@ -8,7 +8,7 @@ import StatButtons from '../StatButtons/StatButtons';
 import './App.scss';
 export default function App() {
 
-  const [date, setDate] = useState("2022-11-28")
+  const [date, setDate] = useState("2022-11-28");
   const [games, setGames] = useState([]);
   const [box, setBox] = useState({});
   const [playByPlay, setPlayByPlay] = useState([]);
