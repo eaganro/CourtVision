@@ -334,7 +334,6 @@ export default function App() {
       })
     });
 
-    console.log('x', awayPlayers);
     let allAct = [];
 
     Object.entries(awayPlayers).forEach(([k, v]) => {
@@ -343,7 +342,7 @@ export default function App() {
       for (let pI = 0; pI < v.length; pI += 1) {
         let a = v[pI];
         if (a.description.includes('PTS') && statOn[0]) {
-          filterPlayer.push(a);
+          filterPlayer.push(a); 
         } else if (a.description.includes('MISS') && statOn[1]) {
           filterPlayer.push(a);
         } else if (a.description.includes('REBOUND') && statOn[2]) {
@@ -387,10 +386,8 @@ export default function App() {
       }
       homePlayers[k] = filterPlayer;
     });
-    console.log(awayPlayers);
 
     allAct.sort((a, b) => a.actionNumber - b.actionNumber);
-    console.log(allAct)
 
     setAllActions(allAct);
     setAwayActions(awayPlayers);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useLayoutEffect, useState } from 'react';
 
 import Player from './Player/Player';
 
@@ -8,6 +8,11 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
 
   const [descriptionArray, setDescriptionArray] = useState([]);
 
+  // const ref = useRef(null);
+  // useLayoutEffect(() => {
+  //   const { height } = ref.current.getBoundingClientRect();
+  //   console.log('Measured tooltip height: ' + height);
+  // }, []);
 
   const playtimes = {};
   Object.keys(awayPlayers).forEach(player => {
@@ -28,15 +33,18 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
     });
   });
 
+  const width = 700;
+  const qWidth = width / 4;
+
   const awayRows = Object.keys(awayPlayers).map(name => {
     return (
-      <Player key={name} actions={awayPlayers[name]} timeline={awayPlayerTimeline[name]} name={name}></Player>
+      <Player key={name} actions={awayPlayers[name]} timeline={awayPlayerTimeline[name]} name={name} width={width}></Player>
     );
   });
 
   const homeRows = Object.keys(homePlayers).map(name => {
     return (
-      <Player key={name} actions={homePlayers[name]} timeline={homePlayerTimeline[name]} name={name}></Player>
+      <Player key={name} actions={homePlayers[name]} timeline={homePlayerTimeline[name]} name={name} width={width}></Player>
     );
   });
 
@@ -57,8 +65,7 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
   let starty = 0;
   const timeline = scoreTimeline.map((t, i) => {
     let x1 = startx;
-    // let x2 = 350 * (t.period - 1) + (((12 - Number(t.clock.slice(2, 4))) * 60) - Number(t.clock.slice(5, 7))) * (350 / (12 * 60));
-    let x2 =  (((t.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (350 * 4);
+    let x2 =  (((t.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
     startx = x2;
 
     let y1 = starty;
@@ -70,13 +77,11 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
     ])
   }).flat();
 
-  timeline.push(<line key={'secondLast'} x1={100 + startx} y1={250 + starty} x2={100 + 350 * 4} y2={250 + starty} style={{ stroke: 'rgb(255,0,0)', strokeWidth:2 }} />)
+  timeline.push(<line key={'secondLast'} x1={100 + startx} y1={250 + starty} x2={100 + qWidth * 4} y2={250 + starty} style={{ stroke: 'rgb(255,0,0)', strokeWidth:2 }} />)
   timeline.unshift(<line key={'Last'} x1={0} y1={250} x2={1500} y2={250} style={{ stroke: 'black', strokeWidth:1 }} />)
-  // timeline.unshift(<line x1={100} y1={10} x2={100} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
-  timeline.unshift(<line key={'q1'} x1={100 + 350} y1={10} x2={100 + 350} y2={490} style={{ stroke:'black', strokeWidth:1 }} />)
-  timeline.unshift(<line key={'q2'} x1={100 + 350 * 2} y1={10} x2={100 + 350 * 2} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
-  timeline.unshift(<line key={'q3'} x1={100 + 350 * 3} y1={10} x2={100 + 350 * 3} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
-  // timeline.unshift(<line x1={100 + 350 * 4} y1={10} x2={100 + 350 * 4} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
+  timeline.unshift(<line key={'q1'} x1={100 + qWidth} y1={10} x2={100 + qWidth} y2={490} style={{ stroke:'black', strokeWidth:1 }} />)
+  timeline.unshift(<line key={'q2'} x1={100 + qWidth * 2} y1={10} x2={100 + qWidth * 2} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
+  timeline.unshift(<line key={'q3'} x1={100 + qWidth * 3} y1={10} x2={100 + qWidth * 3} y2={490} style={{ stroke: 'black', strokeWidth: 1 }} />)
 
   const descriptionList = descriptionArray.map(a => (<div>{a.description} - {a.clock}</div>));
 
@@ -94,7 +99,7 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
       let goneOver = false;
       let sameTime = 1;
       for (let i = 1; i < allActions.length && goneOver === false; i += 1) {
-        const actionPos = (((allActions[i].period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (350 * 4);
+        const actionPos = (((allActions[i].period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (qWidth * 4);
         if (actionPos > pos) {
           goneOver = true;
         } else {
@@ -110,7 +115,7 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
       for (let i = 0; i < sameTime; i += 1) {
         hoverActions.push(allActions[a - i]);
       }
-      console.log(hoverActions.map(a => a.description));
+      // console.log(hoverActions.map(a => a.description));
       setDescriptionArray(hoverActions);
 
 
@@ -121,7 +126,7 @@ export default function Play({ awayPlayers, homePlayers, allActions, scoreTimeli
 
   return (
     <div onMouseMove={mouseOver} className='play'>
-      <div>{descriptionList}</div>
+      <div class="descriptionArea">{descriptionList}</div>
       <svg height="500" width="1500" className='line'>
         {timeline}
       </svg>

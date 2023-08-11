@@ -10,7 +10,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
   });
 
   return (
-    <div className=''>
+    <div className='schedule'>
       <input type="date" value={date} onChange={changeDate}></input>
       {gamesList}
     </div>

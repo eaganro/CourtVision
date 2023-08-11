@@ -1,5 +1,5 @@
 import './Player.scss';
-export default function Player({ actions, timeline, name }) {
+export default function Player({ actions, timeline, name, width }) {
 
   const playerName = name;
 
@@ -13,9 +13,11 @@ export default function Player({ actions, timeline, name }) {
     'Free Throw': 1,
   }
 
+  const qWidth = width / 4;
+
   // console.log(actions.filter(a => a.actionType === 'Substitution'));
   let dots = actions.filter(a => a.actionType !== 'Substitution' && a.actionType !== 'Jump Ball' && a.actionType !==  'Violation').map(a => {
-    let pos = 97.5 + 350 * (a.period - 1) + (((12 - Number(a.clock.slice(2, 4))) * 60) - Number(a.clock.slice(5, 7))) * (350 / (12 * 60));
+    let pos = 97.5 + qWidth * (a.period - 1) + (((12 - Number(a.clock.slice(2, 4))) * 60) - Number(a.clock.slice(5, 7))) * (qWidth / (12 * 60));
     let color = 'orange';
     if (a.description.includes('MISS')) {
       color = 'brown';
@@ -40,8 +42,8 @@ export default function Player({ actions, timeline, name }) {
   });
 
   const playTimeLines = timeline.map((t, i) => {
-    let x1 = 1400 * (t.start / (12 * 60 * 4));
-    let x2 = 1400 * (t.end / (12 * 60 * 4));
+    let x1 = width * (t.start / (12 * 60 * 4));
+    let x2 = width * (t.end / (12 * 60 * 4));
     x2 = isNaN(x2) ? x1 : x2; 
     return <line key={i} x1={x1} y1={12} x2={x2} y2={12} style={{ stroke: 'rgb(0,0,255)', strokeWidth: 1 }} />
   });
