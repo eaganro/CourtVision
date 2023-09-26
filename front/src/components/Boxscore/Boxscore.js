@@ -2,18 +2,18 @@ import './Boxscore.scss';
 export default function Boxscore({ box }) {
   const awayBox = box?.awayTeam?.players.filter(p => p.statistics.minutes).map(p => {
     return (
-      <div key={p.personId}>
+      <div key={p.personId} className="rowGrid">
         <span>{p.firstName} {p.familyName}</span>
         <span>{p.statistics.minutes}</span>
         <span>{p.statistics.fieldGoalsMade}</span>
         <span>{p.statistics.fieldGoalsAttempted}</span>
-        <span>{p.statistics.fieldGoalsPercentage}</span>
+        <span>{p.statistics.fieldGoalsPercentage === 1 ? 100 : (Math.round(p.statistics.fieldGoalsPercentage * 100 * 10) / 10).toFixed(1)}</span>
         <span>{p.statistics.threePointersMade}</span>
         <span>{p.statistics.threePointersAttempted}</span>
-        <span>{p.statistics.threePointersPercentage}</span>
+        <span>{p.statistics.threePointersPercentage === 1 ? 100 : (Math.round(p.statistics.threePointersPercentage * 100 * 10) / 10).toFixed(1)}</span>
         <span>{p.statistics.freeThrowsMade}</span>
         <span>{p.statistics.freeThrowsAttempted}</span>
-        <span>{p.statistics.freeThrowsPercentage}</span>
+        <span>{p.statistics.freeThrowsPercentage === 1 ? 100 : (Math.round(p.statistics.freeThrowsPercentage * 100 * 10) / 10).toFixed(1)}</span>
         <span>{p.statistics.reboundsOffensive}</span>
         <span>{p.statistics.reboundsDefensive}</span>
         <span>{p.statistics.reboundsTotal}</span>
@@ -30,18 +30,18 @@ export default function Boxscore({ box }) {
 
   const homeBox = box?.homeTeam?.players.filter(p => p.statistics.minutes).map(p => {
     return (
-      <div key={p.personId}>
+      <div key={p.personId} className="rowGrid">
         <span>{p.firstName} {p.familyName}</span>
         <span>{p.statistics.minutes}</span>
         <span>{p.statistics.fieldGoalsMade}</span>
         <span>{p.statistics.fieldGoalsAttempted}</span>
-        <span>{p.statistics.fieldGoalsPercentage}</span>
+        <span>{p.statistics.fieldGoalsPercentage === 1 ? 100 : (Math.round(p.statistics.fieldGoalsPercentage * 100 * 10) / 10).toFixed(1)}</span>
         <span>{p.statistics.threePointersMade}</span>
         <span>{p.statistics.threePointersAttempted}</span>
-        <span>{p.statistics.threePointersPercentage}</span>
+        <span>{p.statistics.threePointersPercentage === 1 ? 100 : (Math.round(p.statistics.threePointersPercentage * 100 * 10) / 10).toFixed(1)}</span>
         <span>{p.statistics.freeThrowsMade}</span>
         <span>{p.statistics.freeThrowsAttempted}</span>
-        <span>{p.statistics.freeThrowsPercentage}</span>
+        <span>{p.statistics.freeThrowsPercentage === 1 ? 100 : (Math.round(p.statistics.freeThrowsPercentage * 100 * 10) / 10).toFixed(1)}</span>
         <span>{p.statistics.reboundsOffensive}</span>
         <span>{p.statistics.reboundsDefensive}</span>
         <span>{p.statistics.reboundsTotal}</span>
@@ -58,7 +58,7 @@ export default function Boxscore({ box }) {
 
   return (
     <div className='box'>
-      <div>
+      <div className="rowGrid">
         <span>PLAYER</span>
         <span>MIN</span>
         <span>FGM</span>
@@ -81,13 +81,9 @@ export default function Boxscore({ box }) {
         <span>PTS</span>
         <span>+/-</span>
       </div>
-      <div>
-        Away
-      </div>
+      <div className="rowGrid team">Away</div>
       {awayBox}
-      <div>
-        Home
-      </div>
+      <div className="rowGrid team">Home</div>
       {homeBox}
     </div>
   );

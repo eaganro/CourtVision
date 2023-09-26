@@ -1,9 +1,24 @@
 .box {
+  overflow-x: scroll;
   div {
     span {
       margin: 5px;
       min-width: 20px;
       display: inline-block;
     }
+  }
+
+  .rowGrid {
+    display: grid;
+    grid-template-columns: 240px 65px repeat(19, 50px);
+    justify-content: center;
+  }
+
+  .team {
+    font-weight: bold;
+  }
+
+  &::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
   }
 }
