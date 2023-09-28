@@ -1,5 +1,9 @@
 .box {
   overflow-x: scroll;
+  // width: fit-content;
+  width: 100%;
+
+  // max-width: 100%;
   div {
     span {
       margin: 5px;
@@ -10,15 +14,25 @@
 
   .rowGrid {
     display: grid;
-    grid-template-columns: 240px 65px repeat(19, 50px);
+    grid-template-columns: 200px 65px repeat(19, 50px);
     justify-content: center;
+    width: fit-content;
+    margin: auto;
+
+  }
+
+  .even {
+    background-color: rgb(250, 250, 250);
+  }
+  .odd {
+    background-color: rgb(255, 255, 255);
   }
 
   .team {
     font-weight: bold;
   }
 
-  &::-webkit-scrollbar { 
-    display: none;  /* Safari and Chrome */
-  }
+  // &::-webkit-scrollbar { 
+  //   display: none;  /* Safari and Chrome */
+  // }
 }

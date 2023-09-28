@@ -1,8 +1,14 @@
 import './Boxscore.scss';
 export default function Boxscore({ box }) {
-  const awayBox = box?.awayTeam?.players.filter(p => p.statistics.minutes).map(p => {
+  const awayTeamTotals = { fieldGoalsMade: 0, fieldGoalsAttempted: 0, threePointersMade: 0, threePointersAttempted: 0,
+    freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
+    assists: 0, steals: 0, blocks: 0, turnovers: 0, foulsPersonal: 0, points: 0, plusMinusPoints:0 };
+  const awayBox = box?.awayTeam?.players.filter(p => p.statistics.minutes).map((p, i) => {
+    Object.keys(awayTeamTotals).forEach(k => {
+      awayTeamTotals[k] += p.statistics[k];
+    });
     return (
-      <div key={p.personId} className="rowGrid">
+      <div key={p.personId} className={ "rowGrid " + (i % 2 === 0 ? "even" : "odd") }>
         <span>{p.firstName} {p.familyName}</span>
         <span>{p.statistics.minutes}</span>
         <span>{p.statistics.fieldGoalsMade}</span>
@@ -27,10 +33,41 @@ export default function Boxscore({ box }) {
       </div>
     )
   });
+  const awayTotalRow = awayBox && (
+    <div className={ "rowGrid " + (awayBox.length % 2 === 0 ? 'even' : 'odd')}>
+      <span>TEAM</span>
+      <span></span>
+      <span>{awayTeamTotals.fieldGoalsMade}</span>
+      <span>{awayTeamTotals.fieldGoalsAttempted}</span>
+      <span>{(awayTeamTotals.fieldGoalsMade / awayTeamTotals.fieldGoalsAttempted) === 1 ? 100 : (Math.round((awayTeamTotals.fieldGoalsMade / awayTeamTotals.fieldGoalsAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{awayTeamTotals.threePointersMade}</span>
+      <span>{awayTeamTotals.threePointersAttempted}</span>
+      <span>{(awayTeamTotals.threePointersMade / awayTeamTotals.threePointersAttempted) === 1 ? 100 : (Math.round((awayTeamTotals.threePointersMade / awayTeamTotals.threePointersAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{awayTeamTotals.freeThrowsMade}</span>
+      <span>{awayTeamTotals.freeThrowsAttempted}</span>
+      <span>{(awayTeamTotals.freeThrowsMade / awayTeamTotals.freeThrowsAttempted) === 1 ? 100 : (Math.round((awayTeamTotals.freeThrowsMade / awayTeamTotals.freeThrowsAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{awayTeamTotals.reboundsOffensive}</span>
+      <span>{awayTeamTotals.reboundsDefensive}</span>
+      <span>{awayTeamTotals.reboundsTotal}</span>
+      <span>{awayTeamTotals.assists}</span>
+      <span>{awayTeamTotals.steals}</span>
+      <span>{awayTeamTotals.blocks}</span>
+      <span>{awayTeamTotals.turnovers}</span>
+      <span>{awayTeamTotals.foulsPersonal}</span>
+      <span>{awayTeamTotals.points}</span>
+      <span>{awayTeamTotals.plusMinusPoints}</span>
+    </div>
+  );
 
-  const homeBox = box?.homeTeam?.players.filter(p => p.statistics.minutes).map(p => {
+  const homeTeamTotals = { fieldGoalsMade: 0, fieldGoalsAttempted: 0, threePointersMade: 0, threePointersAttempted: 0,
+    freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
+    assists: 0, steals: 0, blocks: 0, turnovers: 0, foulsPersonal: 0, points: 0, plusMinusPoints:0 };
+  const homeBox = box?.homeTeam?.players.filter(p => p.statistics.minutes).map((p, i) => {
+    Object.keys(homeTeamTotals).forEach(k => {
+      homeTeamTotals[k] += p.statistics[k];
+    });
     return (
-      <div key={p.personId} className="rowGrid">
+      <div key={p.personId} className={ "rowGrid " + (i % 2 === 0 ? "even" : "odd") }>
         <span>{p.firstName} {p.familyName}</span>
         <span>{p.statistics.minutes}</span>
         <span>{p.statistics.fieldGoalsMade}</span>
@@ -55,6 +92,31 @@ export default function Boxscore({ box }) {
       </div>
     )
   });
+  const homeTotalRow = homeBox && (
+    <div className={ "rowGrid " + (homeBox.length % 2 === 0 ? 'even' : 'odd')}>
+      <span>TEAM</span>
+      <span></span>
+      <span>{homeTeamTotals.fieldGoalsMade}</span>
+      <span>{homeTeamTotals.fieldGoalsAttempted}</span>
+      <span>{(homeTeamTotals.fieldGoalsMade / homeTeamTotals.fieldGoalsAttempted) === 1 ? 100 : (Math.round((homeTeamTotals.fieldGoalsMade / homeTeamTotals.fieldGoalsAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{homeTeamTotals.threePointersMade}</span>
+      <span>{homeTeamTotals.threePointersAttempted}</span>
+      <span>{(homeTeamTotals.threePointersMade / homeTeamTotals.threePointersAttempted) === 1 ? 100 : (Math.round((homeTeamTotals.threePointersMade / homeTeamTotals.threePointersAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{homeTeamTotals.freeThrowsMade}</span>
+      <span>{homeTeamTotals.freeThrowsAttempted}</span>
+      <span>{(homeTeamTotals.freeThrowsMade / homeTeamTotals.freeThrowsAttempted) === 1 ? 100 : (Math.round((homeTeamTotals.freeThrowsMade / homeTeamTotals.freeThrowsAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{homeTeamTotals.reboundsOffensive}</span>
+      <span>{homeTeamTotals.reboundsDefensive}</span>
+      <span>{homeTeamTotals.reboundsTotal}</span>
+      <span>{homeTeamTotals.assists}</span>
+      <span>{homeTeamTotals.steals}</span>
+      <span>{homeTeamTotals.blocks}</span>
+      <span>{homeTeamTotals.turnovers}</span>
+      <span>{homeTeamTotals.foulsPersonal}</span>
+      <span>{homeTeamTotals.points}</span>
+      <span>{homeTeamTotals.plusMinusPoints}</span>
+    </div>
+  );
 
   return (
     <div className='box'>
@@ -83,8 +145,10 @@ export default function Boxscore({ box }) {
       </div>
       <div className="rowGrid team">Away</div>
       {awayBox}
+      {awayTotalRow}
       <div className="rowGrid team">Home</div>
       {homeBox}
+      {homeTotalRow}
     </div>
   );
 }
