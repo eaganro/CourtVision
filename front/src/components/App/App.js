@@ -77,6 +77,7 @@ export default function App() {
   }
 
   const processPlayData = (data) => {
+    console.log(data);
     if (data.length === 0) {
       return [];
     }
@@ -405,7 +406,7 @@ export default function App() {
   }
 
   return (
-    <div className=''>
+    <div className='topLevel'>
       <Schedule games={games} date={date} changeDate={changeDate} changeGame={changeGame}></Schedule>
       <Play 
         awayPlayers={awayActions}
