@@ -3,6 +3,7 @@ export default function Boxscore({ box }) {
   const awayTeamTotals = { fieldGoalsMade: 0, fieldGoalsAttempted: 0, threePointersMade: 0, threePointersAttempted: 0,
     freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
     assists: 0, steals: 0, blocks: 0, turnovers: 0, foulsPersonal: 0, points: 0, plusMinusPoints:0 };
+    console.log(box);
   const awayBox = box?.awayTeam?.players.filter(p => p.statistics.minutes).map((p, i) => {
     Object.keys(awayTeamTotals).forEach(k => {
       awayTeamTotals[k] += p.statistics[k];
@@ -120,6 +121,7 @@ export default function Boxscore({ box }) {
 
   return (
     <div className='box'>
+      <div className="rowGrid">{box ? <img height="40" width="40" src={`img/teams/${box?.awayTeam?.teamTricode}.png`}></img> : ''}</div>
       <div className="rowGrid">
         <span>PLAYER</span>
         <span>MIN</span>
@@ -146,6 +148,7 @@ export default function Boxscore({ box }) {
       <div className="rowGrid team">Away</div>
       {awayBox}
       {awayTotalRow}
+      <div className="rowGrid">{box ? <img height="40" width="40" src={`img/teams/${box?.homeTeam?.teamTricode}.png`}></img> : ''}</div>
       <div className="rowGrid team">Home</div>
       {homeBox}
       {homeTotalRow}
