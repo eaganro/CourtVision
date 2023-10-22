@@ -1,4 +1,7 @@
 import './Schedule.scss';
+
+import Button from '@mui/material/Button';
+
 export default function Schedule({ games, date, changeDate, changeGame }) {
 
   const gamesList = games.map(g => {
@@ -13,6 +16,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
     <div className='schedule'>
       <input type="date" value={date} onChange={changeDate}></input>
       {gamesList}
+      <Button variant="text">Text</Button>
     </div>
   );
 }
