@@ -10,6 +10,9 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
   console.log(awayPlayers)
   const [descriptionArray, setDescriptionArray] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [showMouse, setShowMouse] = useState(true);
+  const [mouseLinePos, setMouseLinePos] = useState(null);
+
 
   window.addEventListener("resize", () => {
     setWindowWidth(window.innerWidth);
@@ -99,7 +102,8 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
   const descriptionList = descriptionArray.map(a => (<div>{a.description}</div>));
   descriptionArray[0] && descriptionArray[0] && descriptionList.unshift(<div>{descriptionArray[0].clock} - {descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</div>)
 
-  let showMouse = true;
+  console.log(showMouse)
+  let mouseLine = null;
   const mouseOver = (e) => {
     if (showMouse) {
       let el = e.target;
@@ -130,10 +134,11 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
         hoverActions.push(allActions[a - i]);
       }
       setDescriptionArray(hoverActions);
+      setMouseLinePos(pos + 100);
 
 
-      showMouse = false;
-      setTimeout(() => showMouse = true, 200);
+      // setShowMouse(false);
+      // setTimeout(() => setShowMouse(true), 100);
     }
   }
 
@@ -142,6 +147,9 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
       <div className="descriptionArea">{descriptionList}</div>
       <svg height="600" width={width + 100} className='line'>
         {timeline}
+      </svg>
+      <svg height="600" width={width + 100} className='line'>
+        <line x1={mouseLinePos} y1={10} x2={mouseLinePos} y2={590} style={{ stroke: 'grey', strokeWidth: 1 }} />
       </svg>
       <div class="teamName">{awayTeamName}</div>
       <div className='teamSection'>
