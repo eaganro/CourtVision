@@ -120,7 +120,10 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
       let goneOver = false;
       let sameTime = 1;
       for (let i = 1; i < allActions.length && goneOver === false; i += 1) {
-        const actionPos = (((allActions[i].period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (qWidth * 4);
+        let actionPos = (((allActions[i].period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (qWidth * 4);
+        if (allActions[i].period > 4) {
+          actionPos = ((4 * 12 * 60 + 5 * (allActions[i].period - 4) * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (qWidth * 4);
+        }
         if (actionPos > pos) {
           goneOver = true;
         } else {
