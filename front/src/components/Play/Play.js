@@ -36,7 +36,9 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
       }
     });
   });
-  const width = windowWidth * 0.9 - 100;
+  const width = Math.min(windowWidth * 0.9 - 100, 1135);
+  console.log(width);
+  
   let qWidth = width / 4;
   if (numQs > 4) {
     qWidth = width * (12 / (12 * 4 + 5 * (numQs - 4)))
