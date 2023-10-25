@@ -1,5 +1,5 @@
 import './Player.scss';
-export default function Player({ actions, timeline, name, width, numQs, heightDivide }) {
+export default function Player({ actions, timeline, name, width, numQs, heightDivide, highlight }) {
 
   const playerName = name;
 
@@ -19,10 +19,12 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
   }
 
   // console.log(actions.filter(a => a.actionType === 'Substitution'));
-  let dots = actions.filter(a => a.actionType !== 'Substitution' && a.actionType !== 'Jump Ball' && a.actionType !==  'Violation').map(a => {
-    let pos = 97.5 + (((a.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(a.clock)) / (4 * 12 * 60)) * (qWidth * 4);
+  let dots = actions
+  .filter(a => a.actionType !== 'Substitution' && a.actionType !== 'Jump Ball' && a.actionType !==  'Violation')
+  .map(a => {
+    let pos = 100 + (((a.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(a.clock)) / (4 * 12 * 60)) * (qWidth * 4);
     if (a.period > 4) {
-      pos = 97.5 + ((4 * 12 * 60 + 5 * (a.period - 4) * 60 - timeToSeconds(a.clock)) / (4 * 12 * 60)) * (qWidth * 4);
+      pos = 100 + ((4 * 12 * 60 + 5 * (a.period - 4) * 60 - timeToSeconds(a.clock)) / (4 * 12 * 60)) * (qWidth * 4);
     }
     let color = 'orange';
     if (a.description.includes('MISS')) {
@@ -41,10 +43,20 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
       color = 'pink';
     } else if (a.actionType === 'Foul') {
       color = 'black';
-    } 
+    }
+    let style = {
+      left: `${pos - 2.5}px`,
+      backgroundColor: color
+    };
+    if (highlight.includes(a.actionId)) {
+      style.width = '10px';
+      style.height = '10px';
+      style.top = '7.5px';
+      style.left = `${pos - 5}px`;
+    }
     return (
-      <div key={a.actionId} className="dot" style={{ left: `${pos}px`, backgroundColor: color }}></div>
-    )
+      <div key={a.actionId} className="dot" style={style}></div>
+    );
   });
 
   const playTimeLines = timeline.map((t, i) => {

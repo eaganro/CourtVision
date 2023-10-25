@@ -7,11 +7,11 @@ import './Play.scss';
 
 export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlayers, allActions, scoreTimeline, awayPlayerTimeline, homePlayerTimeline, numQs }) {
 
-  console.log(awayPlayers)
   const [descriptionArray, setDescriptionArray] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showMouse, setShowMouse] = useState(true);
   const [mouseLinePos, setMouseLinePos] = useState(null);
+  const [highlightActionIds, setHighlightActionIds] = useState([]);
 
 
   window.addEventListener("resize", () => {
@@ -45,14 +45,18 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
   const awayLength = Object.keys(awayPlayers).length;
   const awayRows = Object.keys(awayPlayers).map(name => {
     return (
-      <Player key={name} actions={awayPlayers[name]} timeline={awayPlayerTimeline[name]} name={name} width={width} numQs={numQs} heightDivide={awayLength}></Player>
+      <Player key={name} actions={awayPlayers[name]} timeline={awayPlayerTimeline[name]}
+        name={name} width={width} numQs={numQs} heightDivide={awayLength}
+        highlight={highlightActionIds}></Player>
     );
   });
 
   const homeLength = Object.keys(homePlayers).length;
   const homeRows = Object.keys(homePlayers).map(name => {
     return (
-      <Player key={name} actions={homePlayers[name]} timeline={homePlayerTimeline[name]} name={name} width={width} numQs={numQs} heightDivide={homeLength}></Player>
+      <Player key={name} actions={homePlayers[name]} timeline={homePlayerTimeline[name]}
+        name={name} width={width} numQs={numQs} heightDivide={homeLength}
+        highlight={highlightActionIds}></Player>
     );
   });
 
@@ -102,7 +106,6 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
   const descriptionList = descriptionArray.map(a => (<div>{a.description}</div>));
   descriptionArray[0] && descriptionArray[0] && descriptionList.unshift(<div>{descriptionArray[0].clock} - {descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</div>)
 
-  console.log(showMouse)
   let mouseLine = null;
   const mouseOver = (e) => {
     if (showMouse) {
@@ -130,9 +133,12 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
         }
       }
       const hoverActions = [];
+      const hoverActionIds = [];
       for (let i = 0; i < sameTime; i += 1) {
         hoverActions.push(allActions[a - i]);
+        hoverActionIds.push(allActions[a - i].actionId);
       }
+      setHighlightActionIds(hoverActionIds);
       setDescriptionArray(hoverActions);
       setMouseLinePos(pos + 100);
 
