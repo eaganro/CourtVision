@@ -75,7 +75,9 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
 
   let maxLead = Math.max(maxAwayLead, maxHomeLead * -1);
 
-  let maxY = Math.floor(maxLead / 5) * 5 + 10
+  let maxY = Math.floor(maxLead / 5) * 5 + 10;
+
+
 
   let startx = 0;
   let starty = 0;
@@ -106,6 +108,37 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
     let x2 = leftMargin + qWidth * 4 + (5/12 * qWidth) * (q - 4);
     timeline.unshift(<line key={`q${q}`} x1={x1} y1={10} x2={x2} y2={590} style={{ stroke: 'black', strokeWidth: 1 }} />)
   }
+
+
+  let numLines = 0;
+  let lineJump = 0;
+  if ((maxLead / 5) < 5) {
+    numLines = Math.floor(maxLead / 5)
+    lineJump = 5;
+  } else if ((maxLead / 10) < 5) {
+    numLines = Math.floor(maxLead / 10)
+    lineJump = 10;
+  } else if ((maxLead / 15) < 5) {
+    numLines = Math.floor(maxLead / 15)
+    lineJump = 15;
+  } else if ((maxLead / 20) < 5) {
+    numLines = Math.floor(maxLead / 20)
+    lineJump = 20;
+  }
+
+  let lineLabelStyle = {
+    // textAlign: 'right',
+  };
+  for (let i = 0; i < numLines; i += 1) {
+    let posy = 300 + ((i + 1) * lineJump) * - 300 / maxY
+    timeline.unshift(<line key={`sp${1}`} x1={leftMargin - 5} y1={posy} x2={leftMargin + width} y2={posy} strokeDasharray={"5,5"} style={{ stroke: 'lightgrey', strokeWidth: 3 }} />)
+    timeline.unshift(<text x={leftMargin - 10} y={posy + 5} text-anchor="end">{(i + 1) * lineJump}</text>)
+    
+    let negy = 300 + (-1 * (i + 1) * lineJump) * - 300 / maxY
+    timeline.unshift(<line key={`sn${1}`} x1={leftMargin - 5} y1={negy} x2={leftMargin + width} y2={negy} strokeDasharray={"5,5"} style={{ stroke: 'lightgrey', strokeWidth: 3 }} />)
+    timeline.unshift(<text x={leftMargin - 10} y={negy + 5} text-anchor="end">{-1 * (i + 1) * lineJump}</text>)
+  }
+
 
   const descriptionList = descriptionArray.map(a => (<div>{a.description}</div>));
   descriptionArray[0] && descriptionArray[0] && descriptionList.unshift(<div>{descriptionArray[0].clock} - {descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</div>)
