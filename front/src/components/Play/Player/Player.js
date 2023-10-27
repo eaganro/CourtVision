@@ -74,9 +74,9 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
 
   return (
     <div className='player' style={{ height: `${275/heightDivide}px`}}>
-      <div className='playerName' style={{ width: leftMargin }}>{playerName}</div>
+      <div className='playerName' style={{ width: 90 }}>{playerName}</div>
       {dots}
-      <svg width={width} height="20" className='line'>
+      <svg width={width} height="20" className='line' style={{left: leftMargin}}>
         {playTimeLines}
       </svg>
     </div>

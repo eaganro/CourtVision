@@ -131,11 +131,11 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
   };
   for (let i = 0; i < numLines; i += 1) {
     let posy = 300 + ((i + 1) * lineJump) * - 300 / maxY
-    timeline.unshift(<line key={`sp${1}`} x1={leftMargin - 5} y1={posy} x2={leftMargin + width} y2={posy} strokeDasharray={"5,5"} style={{ stroke: 'lightgrey', strokeWidth: 3 }} />)
+    timeline.unshift(<line key={`sp${i}-${awayTeamName}-${homeTeamName}`} x1={leftMargin - 5} y1={posy} x2={leftMargin + width} y2={posy} strokeDasharray={"5,5"} style={{ stroke: 'lightgrey', strokeWidth: 3 }} />)
     timeline.unshift(<text x={leftMargin - 10} y={posy + 5} text-anchor="end">{(i + 1) * lineJump}</text>)
     
     let negy = 300 + (-1 * (i + 1) * lineJump) * - 300 / maxY
-    timeline.unshift(<line key={`sn${1}`} x1={leftMargin - 5} y1={negy} x2={leftMargin + width} y2={negy} strokeDasharray={"5,5"} style={{ stroke: 'lightgrey', strokeWidth: 3 }} />)
+    timeline.unshift(<line key={`sn${i}-${awayTeamName}-${homeTeamName}`} x1={leftMargin - 5} y1={negy} x2={leftMargin + width} y2={negy} strokeDasharray={"5,5"} style={{ stroke: 'lightgrey', strokeWidth: 3 }} />)
     timeline.unshift(<text x={leftMargin - 10} y={negy + 5} text-anchor="end">{-1 * (i + 1) * lineJump}</text>)
   }
 
