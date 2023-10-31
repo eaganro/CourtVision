@@ -55,7 +55,10 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
       style.left = `${pos - 2.5}px`;
     }
     return (
-      <circle key={a.actionId} fill={color} cx={pos} cy="12" r="3" />
+      highlight.includes(a.actionId) ?
+      <circle key={a.actionId} fill={color} cx={pos} cy={"12"} r={"6"} />
+      :
+      <circle key={a.actionId} fill={color} cx={pos} cy={"12"} r={"3"} />
       // <div key={a.actionId} className="dot" style={style}></div>
     );
   });

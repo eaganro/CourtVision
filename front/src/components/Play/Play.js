@@ -78,26 +78,73 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
   let maxY = Math.floor(maxLead / 5) * 5 + 10;
 
 
-
   let startx = 0;
   let starty = 0;
-  const timeline = scoreTimeline.map((t, i) => {
-    let x1 = startx;
-    let x2 = (((t.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
-    if (t.period > 4) {
-      x2 = ((4 * 12 * 60 + 5 * (t.period - 4) * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
-    }
-    startx = x2;
+  let pospoints = [`${leftMargin},300`];
+  let negpoints = [`${leftMargin},300`];
 
-    let y1 = starty;
-    let y2 = t.scoreDiff * - 300 / maxY;
-    starty = y2;
-    return ([
-      <line period={t.period} key={'one' + i} x1={leftMargin + x1} y1={300 + y1} x2={leftMargin + x2} y2={300 + y1} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />,
-      <line period={t.period} key={'two' + i} x1={leftMargin + x2} y1={300 + y1} x2={leftMargin + x2} y2={300 + y2} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />
-    ])
-  }).flat();
+  scoreTimeline.forEach((t, i) => {
+      let x1 = startx;
+      let x2 = (((t.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
+      if (t.period > 4) {
+        x2 = ((4 * 12 * 60 + 5 * (t.period - 4) * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
+      }
+      
+      let y1 = starty;
+      let y2 = t.scoreDiff * -300 / maxY;
 
+      if (y1 <= 0) {
+          pospoints.push(`${leftMargin + x2},${300 + y1}`);
+          if (y2 <= 0) {
+            pospoints.push(`${leftMargin + x2},${300 + y2}`);
+          } else {
+            pospoints.push(`${leftMargin + x2},${300}`);
+            negpoints.push(`${leftMargin + x2},${300}`);
+            negpoints.push(`${leftMargin + x2},${300 + y2}`);
+          }
+      } else {
+          negpoints.push(`${leftMargin + x2},${300 + y1}`);
+          if (y2 >= 0) {
+            negpoints.push(`${leftMargin + x2},${300 + y2}`);
+          } else {
+            negpoints.push(`${leftMargin + x2},${300}`);
+            pospoints.push(`${leftMargin + x2},${300}`);
+            pospoints.push(`${leftMargin + x2},${300 + y2}`);
+          }
+      }
+      
+      startx = x2;
+      starty = y2;
+  });
+  pospoints.push(`2000,300`);
+  negpoints.push(`2000,300`);
+
+
+
+  
+  // points.push('2000,300');
+
+
+  // let startx = 0;
+  // let starty = 0;
+  // const timeline = scoreTimeline.map((t, i) => {
+  //   let x1 = startx;
+  //   let x2 = (((t.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
+  //   if (t.period > 4) {
+  //     x2 = ((4 * 12 * 60 + 5 * (t.period - 4) * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
+  //   }
+  //   startx = x2;
+
+  //   let y1 = starty;
+  //   let y2 = t.scoreDiff * - 300 / maxY;
+  //   starty = y2;
+  //   return ([
+  //     <line period={t.period} key={'one' + i} x1={leftMargin + x1} y1={300 + y1} x2={leftMargin + x2} y2={300 + y1} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />,
+  //     <line period={t.period} key={'two' + i} x1={leftMargin + x2} y1={300 + y1} x2={leftMargin + x2} y2={300 + y2} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />
+  //   ])
+  // }).flat();
+
+  const timeline = [];
   timeline.push(<line key={'secondLast'} x1={leftMargin + startx} y1={300 + starty} x2={leftMargin + width} y2={300 + starty} style={{ stroke: 'rgb(255,0,0)', strokeWidth:2 }} />)
   timeline.unshift(<line key={'Last'} x1={0} y1={300} x2={leftMargin + width} y2={300} style={{ stroke: 'black', strokeWidth:1 }} />)
   timeline.unshift(<line key={'q1'} x1={leftMargin + qWidth} y1={10} x2={leftMargin + qWidth} y2={590} style={{ stroke:'black', strokeWidth:1 }} />)
@@ -202,6 +249,8 @@ export default function Play({ awayTeamName, homeTeamName, awayPlayers, homePlay
       <div className="descriptionArea">{descriptionList}</div>
       <svg height="600" width={width + leftMargin} className='line'>
         {timeline}
+        <polyline points={pospoints.join(' ')} style={{"fill": "red"}}/>
+        <polyline points={negpoints.join(' ')} style={{"fill": "blue"}}/>
       </svg>
       <svg height="600" width={width + leftMargin} className='line'>
         {mouseLinePos !== null ? 
