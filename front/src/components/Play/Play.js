@@ -307,11 +307,11 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
           <line x1={mouseLinePos} y1={10} x2={mouseLinePos} y2={590} style={{ stroke: 'grey', strokeWidth: 1 }} />
           : ''}
       </svg>
-      <div class="teamName">{awayTeamName}</div>
+      <div class="teamName" style={{color: teamColor[awayTeamNames?.abr]?.replaceAll(' ', ', ')}}>{awayTeamName}</div>
       <div className='teamSection'>
         {awayRows}
       </div>
-      <div class="teamName">{homeTeamName}</div>
+      <div class="teamName" style={{color: teamColor[homeTeamNames?.abr]?.replaceAll(' ', ', ')}}>{homeTeamName}</div>
       <div className='teamSection'>
         {homeRows}
       </div>
