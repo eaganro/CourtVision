@@ -207,7 +207,11 @@ export default function App() {
           
           let t = awayPlaytimes[a.playerName].times;
           if (awayPlaytimes[a.playerName].on === false) {
-            t.push({ start: "PT12M00.00S", period: a.period });
+            if (a.period <= 4) {
+              t.push({ start: "PT12M00.00S", period: a.period });
+            } else {
+              t.push({ start: "PT05M00.00S", period: a.period });
+            }
           }
           t[t.length - 1].end = a.clock;
           awayPlaytimes[a.playerName].on = false;
@@ -260,14 +264,22 @@ export default function App() {
 
           let t = homePlaytimes[a.playerName].times;
           if (homePlaytimes[a.playerName].on === false) {
-            t.push({ start: "PT12M00.00S", period: a.period });
+            if (a.period <= 4) {
+              t.push({ start: "PT12M00.00S", period: a.period });
+            } else {
+              t.push({ start: "PT05M00.00S", period: a.period });
+            }
           }
           t[t.length - 1].end = a.clock;
           homePlaytimes[a.playerName].on = false;
         } else {
           if (a.playerName && homePlaytimes[a.playerName].on === false) {
             homePlaytimes[a.playerName].on = true;
-            homePlaytimes[a.playerName].times.push({ start: "PT12M00.00S", period: a.period, end: a.clock });
+            if (a.period <= 4) {
+              homePlaytimes[a.playerName].times.push({ start: "PT12M00.00S", period: a.period, end: a.clock });
+            } else {
+              homePlaytimes[a.playerName].times.push({ start: "PT05M00.00S", period: a.period, end: a.clock });
+            }
           } else if(a.playerName && homePlaytimes[a.playerName].on === true) {
             let t = homePlaytimes[a.playerName].times;
             t[t.length - 1].end = a.clock;
@@ -278,14 +290,14 @@ export default function App() {
     Object.keys(homePlaytimes).forEach(player => {
       if(homePlaytimes[player].on === true) {
         let t = homePlaytimes[player].times;
-        t[t.length - 1].end = "PT00M00.00S";
+        t[t.length - 1].end = lastAction.clock;
       }
       homePlaytimes[player] = homePlaytimes[player].times;
     });
     Object.keys(awayPlaytimes).forEach(player => {
       if(awayPlaytimes[player].on === true) {
         let t = awayPlaytimes[player].times;
-        t[t.length - 1].end = "PT00M00.00S";
+        t[t.length - 1].end = lastAction.clock;
       }
       awayPlaytimes[player] = awayPlaytimes[player].times;
     });
