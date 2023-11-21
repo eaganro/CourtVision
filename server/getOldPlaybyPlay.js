@@ -3,10 +3,11 @@ import * as fs from 'fs';
 import * as cheerio from 'cheerio';
 
 let requestList = [];
+const today = new Date();
 Object.entries(gamesObj).forEach(([k,v]) => {
-  if (new Date() > new Date(k)) {
+  if (today > new Date(k)) {
     v.forEach(gameId => {
-      requestList.push([gameId, Math.random()])
+      requestList.push([gameId, Math.random(), k])
     });
   }
 });
@@ -18,6 +19,7 @@ const getPage = function(i) {
   }
   const gameId = requestList[i][0];
   const gameIdNums = gameId.slice(-10);
+  const date = new Date(requestList[i][2]);
   console.log(`${i} - ${gameId}`);
 
   fs.stat(`public/data/boxData/${gameIdNums}.json`, (err, stat) => {
@@ -44,14 +46,16 @@ const fetchFunc = function(gameId, i) {
 }
 
 const makeFile = function(playByPlay, box, gameId) {
-  fs.writeFile(`public/data/playByPlayData/${gameId}.json`, JSON.stringify(playByPlay), function (err) {
-    if (err) throw err;
-    console.log('Saved!');
-  });
-  fs.writeFile(`public/data/boxData/${gameId}.json`, JSON.stringify(box), function (err) {
-    if (err) throw err;
-    console.log('Saved!');
-  });
+  if (playByPlay.length) {
+    fs.writeFile(`public/data/playByPlayData/${gameId}.json`, JSON.stringify(playByPlay), function (err) {
+      if (err) throw err;
+      console.log('Saved!');
+    });
+    fs.writeFile(`public/data/boxData/${gameId}.json`, JSON.stringify(box), function (err) {
+      if (err) throw err;
+      console.log('Saved!');
+    });
+  }
 }
 
 // requestList.forEach((v, i) => {
