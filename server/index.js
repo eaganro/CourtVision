@@ -2,21 +2,12 @@ import express from 'express';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// import { EventEmitter } from 'events';
-
-
-import testGame from './public/data/playByPlayData/0022300040.json' assert { type: 'json' };
 import schedule from './public/data/schedule/schedule.json' assert { type: 'json' };
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
-// const dataUpdateEmitter = new EventEmitter();
 const port = 3000;
 
 
@@ -38,8 +29,8 @@ wss.on('connection', function connection(ws) {
       }
       gameSubscriptions[gameId].add(ws);
 
-      const playFilePath = path.join(__dirname, 'public', 'data', 'playByPlayData', `${gameId}.json`);
-      const boxFilePath = path.join(__dirname, 'public', 'data', 'boxData', `${gameId}.json`);
+      const playFilePath = `public/data/playByPlayData/${gameId}.json`;
+      const boxFilePath = `public/data/boxData/${gameId}.json`;
       try {
         const play = JSON.parse(await fs.readFile(playFilePath, 'utf8'));
         const box = JSON.parse(await fs.readFile(boxFilePath, 'utf8'));
@@ -59,13 +50,6 @@ wss.on('connection', function connection(ws) {
   });
 
   console.log('connected')
-  // ws.send('something');
-
-  // dataUpdateEmitter.on('newData', (data) => {
-  //   console.log('there')
-  //   console.log(data.length)
-  //   ws.send(JSON.stringify(data));
-  // });
 });
 
 const onDataUpdate = (gameId, newData) => {
@@ -78,7 +62,6 @@ const onDataUpdate = (gameId, newData) => {
     });
   }
   console.log('here')
-  // dataUpdateEmitter.emit('newData', newData);
 };
 
 const emitEvent = function(i) {

@@ -38,7 +38,7 @@ export default function App() {
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    const newWs = new WebSocket('ws://localhost:3000');
+    const newWs = new WebSocket('ws://roryeagan.com:3000');
     setWs(newWs);
 
     newWs.onopen = () => {
