@@ -35,13 +35,13 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
       color = 'blue';
     } else if (a.description.includes('AST')) {
       color = 'green';
-    } else if (a.actionType === 'Turnover') {
+    } else if (a.description.includes('TO)')) {
       color = 'red';
     } else if (a.description.includes('BLK')) {
       color = 'purple';
     } else if (a.description.includes('STL')) {
       color = 'pink';
-    } else if (a.actionType === 'Foul') {
+    } else if (a.description.includes('PF)')) {
       color = 'black';
     }
     let style = {

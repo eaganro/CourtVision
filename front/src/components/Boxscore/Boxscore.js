@@ -3,14 +3,24 @@ export default function Boxscore({ box }) {
   const awayTeamTotals = { fieldGoalsMade: 0, fieldGoalsAttempted: 0, threePointersMade: 0, threePointersAttempted: 0,
     freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
     assists: 0, steals: 0, blocks: 0, turnovers: 0, foulsPersonal: 0, points: 0, plusMinusPoints:0 };
-  const awayBox = box?.awayTeam?.players.filter(p => p.statistics.minutes).map((p, i) => {
+  const awayBox = box?.awayTeam?.players.filter(p => {
+    let minutes = p.statistics.minutes;
+    if (minutes.includes('PT')) {
+      minutes = minutes.slice(2, -4).replace('M', ':');
+    }
+    return minutes !== '00:00';
+  }).map((p, i) => {
     Object.keys(awayTeamTotals).forEach(k => {
       awayTeamTotals[k] += p.statistics[k];
     });
+    let minutes = p.statistics.minutes;
+    if (minutes.includes('PT')) {
+      minutes = minutes.slice(2, -4).replace('M', ':');
+    }
     return (
       <div key={p.personId} className={ "rowGrid stat " + (i % 2 === 0 ? "even" : "odd") }>
         <span className="playerNameCol">{p.firstName} {p.familyName}</span>
-        <span>{p.statistics.minutes}</span>
+        <span>{minutes}</span>
         <span>{p.statistics.fieldGoalsMade}</span>
         <span>{p.statistics.fieldGoalsAttempted}</span>
         <span>{p.statistics.fieldGoalsPercentage === 1 ? 100 : (Math.round(p.statistics.fieldGoalsPercentage * 100 * 10) / 10).toFixed(1)}</span>
@@ -62,14 +72,24 @@ export default function Boxscore({ box }) {
   const homeTeamTotals = { fieldGoalsMade: 0, fieldGoalsAttempted: 0, threePointersMade: 0, threePointersAttempted: 0,
     freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
     assists: 0, steals: 0, blocks: 0, turnovers: 0, foulsPersonal: 0, points: 0, plusMinusPoints:0 };
-  const homeBox = box?.homeTeam?.players.filter(p => p.statistics.minutes).map((p, i) => {
+  const homeBox = box?.homeTeam?.players.filter(p => {
+    let minutes = p.statistics.minutes;
+    if (minutes.includes('PT')) {
+      minutes = minutes.slice(2, -4).replace('M', ':');
+    }
+    return minutes !== '00:00';
+  }).map((p, i) => {
     Object.keys(homeTeamTotals).forEach(k => {
       homeTeamTotals[k] += p.statistics[k];
     });
+    let minutes = p.statistics.minutes;
+    if (minutes.includes('PT')) {
+      minutes = minutes.slice(2, -4).replace('M', ':');
+    }
     return (
       <div key={p.personId} className={ "rowGrid stat " + (i % 2 === 0 ? "even" : "odd") }>
         <span className="playerNameCol">{p.firstName} {p.familyName}</span>
-        <span>{p.statistics.minutes}</span>
+        <span>{minutes}</span>
         <span>{p.statistics.fieldGoalsMade}</span>
         <span>{p.statistics.fieldGoalsAttempted}</span>
         <span>{p.statistics.fieldGoalsPercentage === 1 ? 100 : (Math.round(p.statistics.fieldGoalsPercentage * 100 * 10) / 10).toFixed(1)}</span>

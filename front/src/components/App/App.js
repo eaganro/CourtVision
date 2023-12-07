@@ -517,13 +517,13 @@ export default function App() {
           filterPlayer.push(a);
         } else if (a.actionType === 'Assist' && statOn[3]) {
           filterPlayer.push(a);
-        } else if (a.actionType === 'Turnover' && statOn[4]) {
+        } else if (a.description.includes('TO)') && statOn[4]) {
           filterPlayer.push(a);
         } else if (a.description.includes('BLK') && statOn[5]) {
           filterPlayer.push(a);
         } else if (a.description.includes('STL') && statOn[6]) {
           filterPlayer.push(a);
-        } else if (a.actionType === 'Foul' && statOn[7]) {
+        } else if (a.description.includes('PF)') && statOn[7]) {
           filterPlayer.push(a);
         } 
       }
@@ -542,13 +542,13 @@ export default function App() {
           filterPlayer.push(a);
         } else if (a.actionType === 'Assist' && statOn[3]) {
           filterPlayer.push(a);
-        } else if (a.actionType === 'Turnover' && statOn[4]) {
+        } else if (a.description.includes('TO)') && statOn[4]) {
           filterPlayer.push(a);
         } else if (a.description.includes('BLK') && statOn[5]) {
           filterPlayer.push(a);
         } else if (a.description.includes('STL') && statOn[6]) {
           filterPlayer.push(a);
-        } else if (a.actionType === 'Foul' && statOn[7]) {
+        } else if (a.description.includes('PF)') && statOn[7]) {
           filterPlayer.push(a);
         } 
       }
