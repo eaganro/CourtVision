@@ -55,7 +55,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   window.addEventListener("resize", () => {
     setWindowWidth(window.innerWidth);
   });
-
   const playtimes = {};
   Object.keys(awayPlayers).forEach(player => {
     playtimes[player] = {
@@ -269,7 +268,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       const hoverActionIds = [];
       for (let i = 0; i < sameTime; i += 1) {
         hoverActions.push(allActions[a - i]);
-        hoverActionIds.push(allActions[a - i].actionId);
+        hoverActionIds.push(allActions[a - i].actionNumber);
       }
       setHighlightActionIds(hoverActionIds);
       setDescriptionArray(hoverActions);

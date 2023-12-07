@@ -55,10 +55,10 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
       style.left = `${pos - 2.5}px`;
     }
     return (
-      highlight.includes(a.actionId) ?
-      <circle key={a.actionId} fill={color} cx={pos} cy={"12"} r={"6"} />
+      highlight.includes(a.actionNumber) ?
+      <circle key={a.actionNumber} fill={color} cx={pos} cy={"12"} r={"6"} />
       :
-      <circle key={a.actionId} fill={color} cx={pos} cy={"12"} r={"3"} />
+      <circle key={a.actionNumber} fill={color} cx={pos} cy={"12"} r={"3"} />
       // <div key={a.actionId} className="dot" style={style}></div>
     );
   });
@@ -75,6 +75,7 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
     x2 = isNaN(x2) ? x1 : x2; 
     return <line key={i} x1={x1} y1={12} x2={x2} y2={12} style={{ stroke: 'rgb(0,0,255)', strokeWidth: 1 }} />
   });
+
 
   return (
     <div className='player' style={{ height: `${275/heightDivide}px`}}>

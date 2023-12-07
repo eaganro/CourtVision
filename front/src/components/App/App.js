@@ -8,12 +8,12 @@ import StatButtons from '../StatButtons/StatButtons';
 import './App.scss';
 export default function App() {
 
-  const [date, setDate] = useState("2023-11-21");
+  const [date, setDate] = useState("2023-11-30");
   const [games, setGames] = useState([]);
   const [box, setBox] = useState({});
   const [playByPlay, setPlayByPlay] = useState([]);
   // const [gameId, setGameId] = useState("0022300216");
-  const [gameId, setGameId] = useState("0022300040");
+  const [gameId, setGameId] = useState("0022300271");
   const [awayTeamId, setAwayTeamId] = useState(null);
   const [homeTeamId, setHomeTeamId] = useState(null);
 
@@ -38,7 +38,8 @@ export default function App() {
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    const newWs = new WebSocket('ws://roryeagan.com:3000');
+    // const newWs = new WebSocket('ws://roryeagan.com:3000');
+    const newWs = new WebSocket('ws://localhost:3000');
     setWs(newWs);
 
     newWs.onopen = () => {
@@ -51,8 +52,8 @@ export default function App() {
       const { play, box } = JSON.parse(event.data);
 
       setBox(box);
-      setAwayTeamId(box.awayTeamId);
-      setHomeTeamId(box.homeTeamId);
+      setAwayTeamId(box.awayTeamId ? box.awayTeamId : box.awayTeam.teamId);
+      setHomeTeamId(box.homeTeamId ? box.homeTeamId : box.homeTeam.teamId);
 
       if (play[play.length - 1] && play[play.length - 1].period > 4) {
         setNumQs(play[play.length - 1].period);
@@ -168,6 +169,7 @@ export default function App() {
         playerName = a.description.slice(a.description.slice(0, nameLoc - 2).lastIndexOf(' ') + 1, nameLoc + a.playerName.length);
       }
 
+      // debugger;
       if (playerName) {
         if(a.teamId === awayTeamId) {
           if (!awayPlayers[playerName]) {
@@ -228,7 +230,6 @@ export default function App() {
         playerName = a.description.slice(a.description.slice(0, nameLoc - 2).lastIndexOf(' ') + 1, nameLoc + a.playerName.length);
       }
 
-
       if(a.teamId === awayTeamId) {
         if(a.period !== currentQ) {
           Object.keys(awayPlaytimes).forEach(player => {
@@ -250,7 +251,14 @@ export default function App() {
         if (a.actionType === 'Substitution') {
           let startName = a.description.indexOf('SUB:') + 5;
           let endName = a.description.indexOf('FOR') - 1;
+          // if (a.actionType === 'substitution') {
+          //   startName = a.description.indexOf(':') + 2;
+          //   endName = a.description.length;
+          // }
           let name = a.description.slice(startName, endName);
+          if (name === 'Porter' && a.teamTricode === 'CLE') {
+            name = "Porter Jr."
+          }
           // if (name.includes(' ') && name.split(' ')[1] !== 'Jr.' && name.split(' ')[1].length > 3) {
           //   name = name.split(' ')[1];
           // }
@@ -278,6 +286,34 @@ export default function App() {
           }
           t[t.length - 1].end = a.clock;
           awayPlaytimes[playerName].on = false;
+        } else if (a.actionType === 'substitution') {
+          let name = a.description.slice(a.description.indexOf(':') + 2);
+          let t = awayPlaytimes[name].times;
+          if (a.description.includes('out:')) {
+            if (awayPlaytimes[name].on === false) {
+              if (a.period <= 4) {
+                t.push({ start: "PT12M00.00S", period: a.period });
+              } else {
+                t.push({ start: "PT05M00.00S", period: a.period });
+              }
+            }
+            t[t.length - 1].end = a.clock;
+            awayPlaytimes[name].on = false;
+          } else if (a.description.includes('in:')) {
+            if(awayPlaytimes[name]) {
+              awayPlaytimes[name].times.push({ start: a.clock, period: a.period });
+              awayPlaytimes[name].on = true;
+            } else {
+              awayPlaytimes[name] = {
+                times: [],
+                on: false,
+              };
+              awayPlaytimes[name].times.push({ start: a.clock, period: a.period });
+              awayPlaytimes[name].on = true;
+              awayPlayers[name] = [];
+              console.log('PROBLEM: Player Name Not Found', name);
+            }
+          }
         } else {
           if (playerName && awayPlaytimes[playerName].on === false) {
             awayPlaytimes[playerName].on = true;
@@ -315,6 +351,9 @@ export default function App() {
           let startName = a.description.indexOf('SUB:') + 5;
           let endName = a.description.indexOf('FOR') - 1;
           let name = a.description.slice(startName, endName);
+          if (name === 'Porter' && a.teamTricode === 'CLE') {
+            name = "Porter Jr."
+          }
           // if (name.includes(' ') && name.split(' ')[1] !== 'Jr.' && name.split(' ')[1].length > 3) {
           //   name = name.split(' ')[1];
           // }
@@ -342,6 +381,34 @@ export default function App() {
           }
           t[t.length - 1].end = a.clock;
           homePlaytimes[playerName].on = false;
+        } else if (a.actionType === 'substitution') {
+          let name = a.description.slice(a.description.indexOf(':') + 2);
+          if (a.description.includes('out:')) {
+            let t =  homePlaytimes[name].times;
+            if (homePlaytimes[name].on === false) {
+              if (a.period <= 4) {
+                t.push({ start: "PT12M00.00S", period: a.period });
+              } else {
+                t.push({ start: "PT05M00.00S", period: a.period });
+              }
+            }
+            t[t.length - 1].end = a.clock;
+            homePlaytimes[name].on = false;
+          } else if (a.description.includes('in:')) {
+            if(homePlaytimes[name]) {
+              homePlaytimes[name].times.push({ start: a.clock, period: a.period });
+              homePlaytimes[name].on = true;
+            } else {
+              homePlaytimes[name] = {
+                times: [],
+                on: false,
+              };
+              homePlaytimes[name].times.push({ start: a.clock, period: a.period });
+              homePlaytimes[name].on = true;
+              homePlayers[name] = [];
+              console.log('PROBLEM: Player Name Not Found', name);
+            }
+          }
         } else {
           if (playerName && homePlaytimes[playerName].on === false) {
             homePlaytimes[playerName].on = true;
@@ -383,6 +450,9 @@ export default function App() {
       let lastSpace = a.description.lastIndexOf(' ');
       let endName = startName + a.description.slice(startName, lastSpace).lastIndexOf(' ');
       let name = a.description.slice(startName, endName);
+      if (name === 'Porter' && a.teamTricode === 'CLE') {
+        name = "Porter Jr."
+      }
       // if (name.includes(' ') && name.split(' ')[1] !== 'Jr.' && name.split(' ')[1].length > 3) {
       //   name = name.split(' ')[1];
       // }
@@ -393,8 +463,8 @@ export default function App() {
         actionType: 'Assist',
         clock: a.clock,
         description: a.description.slice(startName, -1),
-        actionId: a.actionId + 'a',
-        actionNumber: a.actionNumber,
+        actionId: a.actionId ? a.actionId + 'a' : a.actionNumber + 'a',
+        actionNumber: a.actionNumber + 'a',
         teamId: a.teamId,
         scoreHome: a.scoreHome,
         scoreAway: a.scoreAway,
@@ -410,6 +480,9 @@ export default function App() {
       let lastSpace = a.description.lastIndexOf(' ');
       let endName = startName + a.description.slice(startName, lastSpace).lastIndexOf(' ');
       let name = a.description.slice(startName, endName);
+      if (name === 'Porter' && a.teamTricode === 'CLE') {
+        name = "Porter Jr."
+      }
       // if (name.includes(' ') && name.split(' ')[1] !== 'Jr.' && name.split(' ')[1].length > 3) {
       //   name = name.split(' ')[1];
       // }
@@ -417,8 +490,8 @@ export default function App() {
         actionType: 'Assist',
         clock: a.clock,
         description: a.description.slice(startName, -1),
-        actionId: a.actionId + 'a',
-        actionNumber: a.actionNumber,
+        actionId: a.actionId ? a.actionId + 'a' : a.actionNumber + 'a',
+        actionNumber: a.actionNumber + 'a',
         teamId: a.teamId,
         scoreHome: a.scoreHome,
         scoreAway: a.scoreAway,
