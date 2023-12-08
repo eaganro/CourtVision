@@ -9,6 +9,18 @@ export default function Boxscore({ box }) {
       minutes = minutes.slice(2, -4).replace('M', ':');
     }
     return minutes !== '00:00';
+  }).sort((a,b) => {
+    let minutesA = a.statistics.minutes;
+    if (minutesA.includes('PT')) {
+      minutesA = minutesA.slice(2, -4).replace('M', ':');
+    }
+    let minutesB = b.statistics.minutes;
+    if (minutesB.includes('PT')) {
+      minutesB = minutesB.slice(2, -4).replace('M', ':');
+    }
+    let [amin, asec] = minutesA.split(':');
+    let [bmin, bsec] = minutesB.split(':');
+    return (bmin * 100 + bsec) - (amin * 100 + asec);
   }).map((p, i) => {
     Object.keys(awayTeamTotals).forEach(k => {
       awayTeamTotals[k] += p.statistics[k];
@@ -78,6 +90,18 @@ export default function Boxscore({ box }) {
       minutes = minutes.slice(2, -4).replace('M', ':');
     }
     return minutes !== '00:00';
+  }).sort((a,b) => {
+    let minutesA = a.statistics.minutes;
+    if (minutesA.includes('PT')) {
+      minutesA = minutesA.slice(2, -4).replace('M', ':');
+    }
+    let minutesB = b.statistics.minutes;
+    if (minutesB.includes('PT')) {
+      minutesB = minutesB.slice(2, -4).replace('M', ':');
+    }
+    let [amin, asec] = minutesA.split(':').map(Number);
+    let [bmin, bsec] = minutesB.split(':').map(Number);
+    return (bmin * 100 + bsec) - (amin * 100 + asec);
   }).map((p, i) => {
     Object.keys(homeTeamTotals).forEach(k => {
       homeTeamTotals[k] += p.statistics[k];
