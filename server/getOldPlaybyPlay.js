@@ -36,12 +36,16 @@ const fetchFunc = function(gameId, i) {
     .then(res=> res.text()).then(data => {
       const $ = cheerio.load(data);
       const obj = JSON.parse($('#__NEXT_DATA__').html());
-      const playByPlay = obj.props.pageProps.playByPlay.actions;
-      const box = obj.props.pageProps.game;
-      makeFile(playByPlay, box, gameId.slice(-10));
-      setTimeout(() => {
-        getPage(i + 1);
-      }, Math.random() * 0)
+      if (obj === null){
+        fetchFunc(gameId, i);
+      } else {
+        const playByPlay = obj.props.pageProps.playByPlay.actions;
+        const box = obj.props.pageProps.game;
+        makeFile(playByPlay, box, gameId.slice(-10));
+        setTimeout(() => {
+          getPage(i + 1);
+        }, Math.random() * 0)
+      }
     });
 }
 
