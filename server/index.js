@@ -4,6 +4,8 @@ import { WebSocketServer } from 'ws';
 import fs from 'fs/promises';
 
 import schedule from './public/data/schedule/schedule.json' assert { type: 'json' };
+import myEmitter from './eventEmitter.js';
+
 
 const app = express();
 const server = http.createServer(app);
@@ -52,14 +54,27 @@ wss.on('connection', function connection(ws) {
   console.log('connected')
 });
 
-const onDataUpdate = (gameId, newData) => {
+myEmitter.on('update', ({gameId, type, data}) => {
+  console.log(gameId);
+  onDataUpdate(gameId, type, data);
+});
+
+const onDataUpdate = async (gameId, type, data) => {
+  console.log(gameId, type)
   const subscribers = gameSubscriptions[gameId];
   if (subscribers) {
-    subscribers.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(newData));
-      }
-    });
+    // const filePath = `public/data/${type}/${gameId}.json`;
+    try {
+      // const data = JSON.parse(await fs.readFile(filePath, 'utf8'));
+      subscribers.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ type, data }));
+        }
+      });
+    } catch (error) {
+      console.error('Error reading file:', error);
+      ws.send(JSON.stringify({ error: 'Failed to read data' }));
+    }
   }
   console.log('here')
 };
