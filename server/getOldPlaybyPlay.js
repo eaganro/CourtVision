@@ -1,5 +1,6 @@
 import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json' };
 import * as fs from 'fs';
+import fsp from 'fs/promises';
 import * as cheerio from 'cheerio';
 
 let requestList = [];
@@ -13,7 +14,7 @@ Object.entries(gamesObj).forEach(([k,v]) => {
 });
 requestList.sort((a, b) => a[1] - b[1]);
 
-const getPage = function(i) {
+const getPage = async function(i) {
   if (i === requestList.length) {
     return;
   }
@@ -22,13 +23,21 @@ const getPage = function(i) {
   const date = new Date(requestList[i][2]);
   console.log(`${i} - ${gameId}`);
 
-  fs.stat(`public/data/boxData/${gameIdNums}.json`, (err, stat) => {
-    if (stat === undefined) {
-      fetchFunc(gameId, i);
-    } else {
-      getPage(i + 1);
-    }
-  });
+  let boxStat, playStat;
+  try {
+    boxStat = await fsp.stat(`public/data/boxData/${gameIdNums}.json`);
+    playStat = await fsp.stat(`public/data/playByPlayData/${gameIdNums}.json`);
+    getPage(i + 1);
+  } catch (error) {
+    fetchFunc(gameId, i);
+  }
+  // fs.stat(`public/data/boxData/${gameIdNums}.json`, (err, stat) => {
+  //   if (stat === undefined) {
+  //     fetchFunc(gameId, i);
+  //   } else {
+  //     getPage(i + 1);
+  //   }
+  // });
 }
 
 const fetchFunc = function(gameId, i) {
