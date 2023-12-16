@@ -58,7 +58,6 @@ wss.on('connection', function connection(ws) {
 
       try {
         const dateData = await database.getDate(date)
-        console.log(dateData.rows);
         ws.send(JSON.stringify({ type: 'date', data: dateData.rows }));
       } catch (error) {
         console.error('Error reading file:', error);
@@ -83,12 +82,12 @@ myEmitter.on('update', ({gameId, type, data}) => {
 myEmitter.on('scheduleUpdate', async ({date, type}) => {
   if (type === 'date'){
     const data = await database.getDate(date);
-    const subscribers = gameSubscriptions[gameId];
+    const subscribers = dateSubscriptions[date];
     if (subscribers) {
       try {
         subscribers.forEach((client) => {
           if (client.readyState === 1) {
-            client.send(JSON.stringify({ type, data }));
+            client.send(JSON.stringify({ type, data: data.rows }));
           }
         });
       } catch (error) {

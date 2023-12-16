@@ -2,6 +2,8 @@ import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json
 import * as fs from 'fs';
 import fsp from 'fs/promises';
 import * as cheerio from 'cheerio';
+import database from './database.js';
+
 
 let requestList = [];
 const today = new Date();
@@ -27,7 +29,12 @@ const getPage = async function(i) {
   try {
     boxStat = await fsp.stat(`public/data/boxData/${gameIdNums}.json`);
     playStat = await fsp.stat(`public/data/playByPlayData/${gameIdNums}.json`);
-    getPage(i + 1);
+    let box = JSON.parse(await fsp.readFile(`public/data/boxData/${gameIdNums}.json`));
+    if (box.gameStatusText !== 'Final') {
+      fetchFunc(gameId, i);
+    } else {
+      getPage(i + 1);
+    }
   } catch (error) {
     fetchFunc(gameId, i);
   }
@@ -50,6 +57,7 @@ const fetchFunc = function(gameId, i) {
       } else {
         const playByPlay = obj.props.pageProps.playByPlay.actions;
         const box = obj.props.pageProps.game;
+        database.insertGame(box);
         makeFile(playByPlay, box, gameId.slice(-10));
         setTimeout(() => {
           getPage(i + 1);
