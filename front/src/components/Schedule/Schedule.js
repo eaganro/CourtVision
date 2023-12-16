@@ -2,12 +2,45 @@ import './Schedule.scss';
 
 export default function Schedule({ games, date, changeDate, changeGame }) {
 
-  const gamesList = games.map(g => {
+  console.log(games);
+  const gamesList = games.sort((a,b) => {
+    let datetimeA = new Date(a.starttime);
+    let datetimeB = new Date(b.starttime);
+    if (a.status === 'final' && b.status === 'final') {
+      if (datetimeA < datetimeB) {
+        return -1;
+      } else if (datetimeA > datetimeB) {
+        return 1;
+      } else {
+        if (a.hometeam > b.hometeam) {
+          return 1;
+        } else {
+          return -1;
+        }
+      }
+    } else if (a.status === 'final') {
+        return 1;
+    } else if (b.status === 'final') {
+      return -1;
+    } else {
+      if (datetimeA < datetimeB) {
+        return -1;
+      } else if (datetimeA > datetimeB) {
+        return 1;
+      } else {
+        if (a.hometeam > b.hometeam) {
+          return 1;
+        } else {
+          return -1;
+        }
+      }
+    }
+  }).map(g => {
     return (
-      <div className='game' key={g.gameId} onClick={() => changeGame(g.gameId)}>
-        <div>{g.away} - {g.home}</div>
-        <div>{'sco'} - {'sco'}</div>
-        <div>{'time'}</div>
+      <div className='game' key={g.id} onClick={() => changeGame(g.id)}>
+        <div>{g.awayteam} - {g.hometeam}</div>
+        <div>{g.awayscore} - {g.homescore}</div>
+        <div>{g.status}</div>
       </div>
     )
   });

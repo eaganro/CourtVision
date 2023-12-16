@@ -9,7 +9,8 @@ import StatButtons from '../StatButtons/StatButtons';
 import './App.scss';
 export default function App() {
 
-  const [date, setDate] = useState("2023-12-11");
+  let today = new Date();
+  const [date, setDate] = useState(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`);
   const [games, setGames] = useState([]);
   const [box, setBox] = useState({});
   const [playByPlay, setPlayByPlay] = useState([]);
@@ -47,6 +48,7 @@ export default function App() {
     newWs.onopen = () => {
       console.log('Connected to WebSocket');
       newWs.send(JSON.stringify({ type: 'gameId', gameId }));
+      newWs.send(JSON.stringify({ type: 'date', date }));
     };
 
     newWs.onmessage = (event) => {
@@ -66,6 +68,10 @@ export default function App() {
         setBox(box);
         setAwayTeamId(box.awayTeamId ? box.awayTeamId : box.awayTeam.teamId);
         setHomeTeamId(box.homeTeamId ? box.homeTeamId : box.homeTeam.teamId);
+      } else if (data.type === 'date') {
+        let scheduleGames = data.data;
+        console.log(scheduleGames);
+        setGames(scheduleGames);
       } else {
         // console.log('Message from server ', event.data);
         const { play, box } = data;
@@ -95,15 +101,19 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    fetch(`/games?date=${date}`).then(r =>  {
-      if (r.status === 404) {
-        return [];
-      } else {
-        return r.json()
-      }
-    }).then(gamesData => {
-      setGames(gamesData);
-    });
+    if (ws) {
+      ws.send(JSON.stringify({ type: 'date', date }));
+    } else {
+      // fetch(`/games?date=${date}`).then(r =>  {
+      //   if (r.status === 404) {
+      //     return [];
+      //   } else {
+      //     return r.json()
+      //   }
+      // }).then(gamesData => {
+      //   setGames(gamesData);
+      // });
+    }
   }, [date]);
 
   useEffect(() => {

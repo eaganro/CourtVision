@@ -63,7 +63,13 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
     );
   });
 
-  const playTimeLines = timeline?.map((t, i) => {
+  const playTimeLines = timeline?.filter(t => {
+    if (!t.end) {
+      console.log('PLAYER TIMELINE ERROR', name)
+      return false;
+    }
+    return true;
+  }).map((t, i) => {
     let x1 = (((t.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(t.start)) / (4 * 12 * 60)) * (qWidth * 4);
     if (t.period > 4) {
       x1 = ((4 * 12 * 60 + 5 * (t.period - 4) * 60 - timeToSeconds(t.start)) / (4 * 12 * 60)) * (qWidth * 4);
