@@ -55,19 +55,46 @@ export default function Boxscore({ box }) {
       </div>
     )
   });
+  let awayFG;
+  if ((awayTeamTotals.fieldGoalsMade / awayTeamTotals.fieldGoalsAttempted) === 1) {
+    awayFG = 100;
+  } else {
+    awayFG = (Math.round((awayTeamTotals.fieldGoalsMade / awayTeamTotals.fieldGoalsAttempted) * 100 * 10) / 10).toFixed(1)
+  }
+  if (awayFG === 'NaN') {
+    awayFG = 0;
+  }
+  let away3pt;
+  if ((awayTeamTotals.threePointersMade / awayTeamTotals.threePointersAttempted) === 1) {
+    away3pt = 100;
+  } else {
+    away3pt = (Math.round((awayTeamTotals.threePointersMade / awayTeamTotals.threePointersAttempted) * 100 * 10) / 10).toFixed(1)
+  }
+  if (away3pt === 'NaN') {
+    away3pt = 0;
+  }
+  let awayFT;
+  if ((awayTeamTotals.freeThrowsMade / awayTeamTotals.freeThrowsAttempted) === 1) {
+    awayFT = 100;
+  } else {
+    awayFT = (Math.round((awayTeamTotals.freeThrowsMade / awayTeamTotals.freeThrowsAttempted) * 100 * 10) / 10).toFixed(1)
+  }
+  if (awayFT === 'NaN') {
+    awayFT = 0;
+  }
   const awayTotalRow = awayBox && (
     <div className={ "rowGrid stat " + (awayBox.length % 2 === 0 ? 'even' : 'odd')}>
       <span className="playerNameCol">TEAM</span>
       <span></span>
       <span>{awayTeamTotals.fieldGoalsMade}</span>
       <span>{awayTeamTotals.fieldGoalsAttempted}</span>
-      <span>{(awayTeamTotals.fieldGoalsMade / awayTeamTotals.fieldGoalsAttempted) === 1 ? 100 : (Math.round((awayTeamTotals.fieldGoalsMade / awayTeamTotals.fieldGoalsAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{awayFG}</span>
       <span>{awayTeamTotals.threePointersMade}</span>
       <span>{awayTeamTotals.threePointersAttempted}</span>
-      <span>{(awayTeamTotals.threePointersMade / awayTeamTotals.threePointersAttempted) === 1 ? 100 : (Math.round((awayTeamTotals.threePointersMade / awayTeamTotals.threePointersAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{away3pt}</span>
       <span>{awayTeamTotals.freeThrowsMade}</span>
       <span>{awayTeamTotals.freeThrowsAttempted}</span>
-      <span>{(awayTeamTotals.freeThrowsMade / awayTeamTotals.freeThrowsAttempted) === 1 ? 100 : (Math.round((awayTeamTotals.freeThrowsMade / awayTeamTotals.freeThrowsAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{awayFT}</span>
       <span>{awayTeamTotals.reboundsOffensive}</span>
       <span>{awayTeamTotals.reboundsDefensive}</span>
       <span>{awayTeamTotals.reboundsTotal}</span>
@@ -136,19 +163,46 @@ export default function Boxscore({ box }) {
       </div>
     )
   });
+  let homeFG;
+  if ((homeTeamTotals.fieldGoalsMade / homeTeamTotals.fieldGoalsAttempted) === 1) {
+    homeFG = 100;
+  } else {
+    homeFG = (Math.round((homeTeamTotals.fieldGoalsMade / homeTeamTotals.fieldGoalsAttempted) * 100 * 10) / 10).toFixed(1)
+  }
+  if (homeFG === 'NaN') {
+    homeFG = 0;
+  }
+  let home3pt;
+  if ((homeTeamTotals.threePointersMade / homeTeamTotals.threePointersAttempted) === 1) {
+    home3pt = 100;
+  } else {
+    home3pt = (Math.round((homeTeamTotals.threePointersMade / homeTeamTotals.threePointersAttempted) * 100 * 10) / 10).toFixed(1)
+  }
+  if (home3pt === 'NaN') {
+    home3pt = 0;
+  }
+  let homeFT;
+  if ((homeTeamTotals.freeThrowsMade / homeTeamTotals.freeThrowsAttempted) === 1) {
+    homeFT = 100;
+  } else {
+    homeFT = (Math.round((homeTeamTotals.freeThrowsMade / homeTeamTotals.freeThrowsAttempted) * 100 * 10) / 10).toFixed(1)
+  }
+  if (homeFT === 'NaN') {
+    homeFT = 0;
+  }
   const homeTotalRow = homeBox && (
     <div className={ "rowGrid stat " + (homeBox.length % 2 === 0 ? 'even' : 'odd')}>
       <span className="playerNameCol">TEAM</span>
       <span></span>
       <span>{homeTeamTotals.fieldGoalsMade}</span>
       <span>{homeTeamTotals.fieldGoalsAttempted}</span>
-      <span>{(homeTeamTotals.fieldGoalsMade / homeTeamTotals.fieldGoalsAttempted) === 1 ? 100 : (Math.round((homeTeamTotals.fieldGoalsMade / homeTeamTotals.fieldGoalsAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{homeFG}</span>
       <span>{homeTeamTotals.threePointersMade}</span>
       <span>{homeTeamTotals.threePointersAttempted}</span>
-      <span>{(homeTeamTotals.threePointersMade / homeTeamTotals.threePointersAttempted) === 1 ? 100 : (Math.round((homeTeamTotals.threePointersMade / homeTeamTotals.threePointersAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{home3pt}</span>
       <span>{homeTeamTotals.freeThrowsMade}</span>
       <span>{homeTeamTotals.freeThrowsAttempted}</span>
-      <span>{(homeTeamTotals.freeThrowsMade / homeTeamTotals.freeThrowsAttempted) === 1 ? 100 : (Math.round((homeTeamTotals.freeThrowsMade / homeTeamTotals.freeThrowsAttempted) * 100 * 10) / 10).toFixed(1)}</span>
+      <span>{homeFT}</span>
       <span>{homeTeamTotals.reboundsOffensive}</span>
       <span>{homeTeamTotals.reboundsDefensive}</span>
       <span>{homeTeamTotals.reboundsTotal}</span>

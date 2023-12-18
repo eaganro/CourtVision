@@ -87,7 +87,6 @@ export default function App() {
         }
         setLastAction(play[play.length - 1])
         setPlayByPlay(play);
-        setPlayByPlay(play);
       }
     };
 
@@ -155,6 +154,12 @@ export default function App() {
 
   const processPlayData = (data) => {
     if (data.length === 0) {
+      setAwayPlayerTimeline([]);
+      setHomePlayerTimeline([]);
+      setScoreTimeline([]);
+      setAllActions([]);
+      setAwayActions([]);
+      setHomeActions([]);
       return [];
     }
     let awayPlayers = {

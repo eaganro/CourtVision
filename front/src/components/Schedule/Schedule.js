@@ -6,7 +6,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
   const gamesList = games.sort((a,b) => {
     let datetimeA = new Date(a.starttime);
     let datetimeB = new Date(b.starttime);
-    if (a.status === 'final' && b.status === 'final') {
+    if (a.status.startsWith('Final') && b.status.startsWith('Final')) {
       if (datetimeA < datetimeB) {
         return -1;
       } else if (datetimeA > datetimeB) {
@@ -18,9 +18,9 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
           return -1;
         }
       }
-    } else if (a.status === 'final') {
+    } else if (a.status.startsWith('Final')) {
         return 1;
-    } else if (b.status === 'final') {
+    } else if (b.status.startsWith('Final')) {
       return -1;
     } else {
       if (datetimeA < datetimeB) {
@@ -39,7 +39,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
     return (
       <div className='game' key={g.id} onClick={() => changeGame(g.id)}>
         <div>{g.awayteam} - {g.hometeam}</div>
-        <div>{g.awayscore} - {g.homescore}</div>
+        <div>{g.status.endsWith('ET') ? '--' : g.awayscore} - {g.status.endsWith('ET') ? '--' : g.homescore}</div>
         <div>{g.status}</div>
       </div>
     )
