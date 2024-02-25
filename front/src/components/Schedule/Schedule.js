@@ -110,6 +110,8 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
     console.log(x,y,z);
   }
 
+  console.log(date);
+
   return (
     <div className='schedule'>
       <button onClick={dateDown}>{'<'}</button>

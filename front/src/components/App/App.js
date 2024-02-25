@@ -10,12 +10,22 @@ import './App.scss';
 export default function App() {
 
   let today = new Date();
-  const [date, setDate] = useState(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`);
+  today.setDate(today.getDate());
+  let month = today.getMonth() + 1;
+  if (month < 10) {
+    month = '0' + month;
+  }
+  let day = today.getDate();
+  if (day < 10) {
+    day = '0' + day;
+  }
+  let val = `${today.getFullYear()}-${month}-${day}`
+  const [date, setDate] = useState(val);
   const [games, setGames] = useState([]);
   const [box, setBox] = useState({});
   const [playByPlay, setPlayByPlay] = useState([]);
   // const [gameId, setGameId] = useState("0022300216");
-  const [gameId, setGameId] = useState("0062300001");
+  const [gameId, setGameId] = useState("0022300779");
   const [awayTeamId, setAwayTeamId] = useState(null);
   const [homeTeamId, setHomeTeamId] = useState(null);
 
@@ -41,8 +51,8 @@ export default function App() {
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    // const newWs = new WebSocket('ws://roryeagan.com:3000');
-    const newWs = new WebSocket('ws://localhost:3000');
+    const newWs = new WebSocket('wss://roryeagan.com/nba/wss');
+    // const newWs = new WebSocket('ws://localhost:3000');
     setWs(newWs);
 
     newWs.onopen = () => {
