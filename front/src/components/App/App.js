@@ -85,20 +85,7 @@ export default function App() {
         console.log(scheduleGames);
         setGames(scheduleGames);
       } else {
-        // console.log('Message from server ', event.data);
-        const { play, box } = data;
-
-        setBox(box);
-        setAwayTeamId(box.awayTeamId ? box.awayTeamId : box.awayTeam.teamId);
-        setHomeTeamId(box.homeTeamId ? box.homeTeamId : box.homeTeam.teamId);
-
-        if (play[play.length - 1] && play[play.length - 1].period > 4) {
-          setNumQs(play[play.length - 1].period);
-        } else {
-          setNumQs(4);
-        }
-        setLastAction(play[play.length - 1])
-        setPlayByPlay(play);
+        gameDataReceiver(data);
       }
     };
 
@@ -116,21 +103,33 @@ export default function App() {
     if (ws && wsOpen) {
       ws.send(JSON.stringify({ type: 'date', date }));
     } else {
-      // fetch(`/games?date=${date}`).then(r =>  {
-      //   if (r.status === 404) {
-      //     return [];
-      //   } else {
-      //     return r.json()
-      //   }
-      // }).then(gamesData => {
-      //   setGames(gamesData);
-      // });
+      fetch(`/games?date=${date}`).then(r =>  {
+        if (r.status === 404) {
+          return [];
+        } else {
+          return r.json()
+        }
+      }).then(gamesData => {
+        setGames(gamesData.data);
+      });
     }
   }, [date]);
 
   useEffect(() => {
-    if (ws) {
+    if (ws && wsOpen) {
       ws.send(JSON.stringify({ type: 'gameId', gameId }));
+    } else {
+      console.log('no ws');
+      fetch(`/game?gameId=${gameId}`).then(r =>  {
+        if (r.status === 404) {
+          return [];
+        } else {
+          return r.json()
+        }
+      }).then(gameData => {
+        console.log(gameData);
+        gameDataReceiver(gameData);
+      });
     }
     // Promise.all([fetch(`/data/boxData/${gameId}.json`), fetch(`/data/playByPlayData/${gameId}.json`)]).then(d => {
     // Promise.all([fetch(`/data/boxData/${gameId}.json`)]).then(d => {
@@ -156,6 +155,22 @@ export default function App() {
   useEffect(() => {
     processPlayData(playByPlay);
   }, [playByPlay, statOn]);
+
+  const gameDataReceiver = (data) => {
+    const { play, box } = data;
+
+    setBox(box);
+    setAwayTeamId(box.awayTeamId ? box.awayTeamId : box.awayTeam.teamId);
+    setHomeTeamId(box.homeTeamId ? box.homeTeamId : box.homeTeam.teamId);
+
+    if (play[play.length - 1] && play[play.length - 1].period > 4) {
+      setNumQs(play[play.length - 1].period);
+    } else {
+      setNumQs(4);
+    }
+    setLastAction(play[play.length - 1])
+    setPlayByPlay(play);
+  }
 
   const changeDate = (e) => {
     setDate(e.target.value);

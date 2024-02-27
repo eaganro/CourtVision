@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws';
-import fs from 'fs/promises';
+import fsp from 'fs/promises';
 
 import database from './database.js';
 import myEmitter from './eventEmitter.js';
@@ -29,8 +29,8 @@ wss.on('connection', function connection(ws) {
       const playFilePath = `public/data/playByPlayData/${gameId}.json`;
       const boxFilePath = `public/data/boxData/${gameId}.json`;
       try {
-        const play = JSON.parse(await fs.readFile(playFilePath, 'utf8'));
-        const box = JSON.parse(await fs.readFile(boxFilePath, 'utf8'));
+        const play = JSON.parse(await fsp.readFile(playFilePath, 'utf8'));
+        const box = JSON.parse(await fsp.readFile(boxFilePath, 'utf8'));
         ws.send(JSON.stringify({play, box}));
       } catch (error) {
         console.error('Error reading file:', error);

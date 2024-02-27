@@ -1,9 +1,7 @@
 import express from 'express';
 import http from 'http';
-
-import schedule from './public/data/schedule/schedule.json' assert { type: 'json' };
-
-
+import fsp from 'fs/promises';
+import database from './database.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -15,35 +13,29 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
-app.get('/games', (req, res) => {
-  let gamesArray = schedule[req.query.date]?.map(s => {
-    return {
-      away: s.split('-')[0],
-      home: s.split('-')[2],
-      gameId: s.split('-')[3]
-    }
-  });
-  console.log(gamesArray);
-  if (gamesArray === undefined) {
-    res.sendStatus(404)
-  } else {
-    res.send(gamesArray);
+app.get('/game', async (req, res) => {
+  const { gameId } = req.query;
+  const playFilePath = `public/data/playByPlayData/${gameId}.json`;
+  const boxFilePath = `public/data/boxData/${gameId}.json`;
+  try {
+    const play = JSON.parse(await fsp.readFile(playFilePath, 'utf8'));
+    const box = JSON.parse(await fsp.readFile(boxFilePath, 'utf8'));
+    res.send(JSON.stringify({play, box}));
+  } catch (error) {
+    console.error('Error reading file:', error);
+    res.send(JSON.stringify({ error: 'Failed to read data' }));
   }
 });
 
-app.get('/game', (req, res) => {
-  let obj = {
-    playByPlay: {}
-  };
-  let gamesArray = schedule[req.query.date].map(s => {
-    return {
-      away: s.split('-')[0],
-      home: s.split('-')[2],
-      gameId: s.split('-')[3]
-    }
-  });
-  console.log(gamesArray);
-  res.send(gamesArray);
+app.get('/games', async (req, res) => {
+  const { date } = req.query;
+  try {
+    const dateData = await database.getDate(date)
+    res.send(JSON.stringify({ data: dateData.rows }));
+  } catch (error) {
+    console.error('Error reading file:', error);
+    res.send(JSON.stringify({ error: 'Failed to read data' }));
+  }
 });
 
 server.listen(port, () => {
