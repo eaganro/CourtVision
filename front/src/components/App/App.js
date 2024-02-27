@@ -49,16 +49,18 @@ export default function App() {
   const [lastAction, setLastAction] = useState(null);
 
   const [ws, setWs] = useState(null);
+  const [wsOpen, setWsOpen] = useState(false);
 
   useEffect(() => {
-    const newWs = new WebSocket('wss://roryeagan.com/nba/wss');
-    // const newWs = new WebSocket('ws://localhost:3000');
+    // const newWs = new WebSocket('wss://roryeagan.com/nba/wss');
+    const newWs = new WebSocket('ws://localhost:3001');
     setWs(newWs);
 
     newWs.onopen = () => {
       console.log('Connected to WebSocket');
       newWs.send(JSON.stringify({ type: 'gameId', gameId }));
       newWs.send(JSON.stringify({ type: 'date', date }));
+      setWsOpen(true);
     };
 
     newWs.onmessage = (event) => {
@@ -106,11 +108,12 @@ export default function App() {
 
     return () => {
       newWs.close();
+      setWsOpen(false);
     };
   }, []);
 
   useEffect(() => {
-    if (ws) {
+    if (ws && wsOpen) {
       ws.send(JSON.stringify({ type: 'date', date }));
     } else {
       // fetch(`/games?date=${date}`).then(r =>  {
