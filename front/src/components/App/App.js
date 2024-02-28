@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { timeToSeconds, sortActions } from '../../utils';
 
 import Schedule from '../Schedule/Schedule';
 import Score from '../Score/Score';
@@ -49,7 +50,6 @@ export default function App() {
   const [lastAction, setLastAction] = useState(null);
 
   const [ws, setWs] = useState(null);
-  const [wsOpen, setWsOpen] = useState(false);
 
   useEffect(() => {
     // const newWs = new WebSocket('wss://roryeagan.com/nba/wss');
@@ -60,7 +60,6 @@ export default function App() {
       console.log('Connected to WebSocket');
       newWs.send(JSON.stringify({ type: 'gameId', gameId }));
       newWs.send(JSON.stringify({ type: 'date', date }));
-      setWsOpen(true);
     };
 
     newWs.onmessage = (event) => {
@@ -95,12 +94,11 @@ export default function App() {
 
     return () => {
       newWs.close();
-      setWsOpen(false);
     };
   }, []);
 
   useEffect(() => {
-    if (ws && wsOpen) {
+    if (ws && ws.readyState === 1) {
       ws.send(JSON.stringify({ type: 'date', date }));
     } else {
       fetch(`/games?date=${date}`).then(r =>  {
@@ -116,7 +114,7 @@ export default function App() {
   }, [date]);
 
   useEffect(() => {
-    if (ws && wsOpen) {
+    if (ws && ws.readyState === 1) {
       ws.send(JSON.stringify({ type: 'gameId', gameId }));
     } else {
       console.log('no ws');
@@ -131,25 +129,6 @@ export default function App() {
         gameDataReceiver(gameData);
       });
     }
-    // Promise.all([fetch(`/data/boxData/${gameId}.json`), fetch(`/data/playByPlayData/${gameId}.json`)]).then(d => {
-    // Promise.all([fetch(`/data/boxData/${gameId}.json`)]).then(d => {
-    //   return Promise.all(d.map(r => r.json()));
-    // }).then(d => {
-    //   const boxData = d[0];
-    //   setBox(boxData);
-    //   setAwayTeamId(boxData.awayTeamId);
-    //   setHomeTeamId(boxData.homeTeamId);
-
-    //   // const play = d[1];
-    //   // if (play[play.length - 1] && play[play.length - 1].period > 4) {
-    //   //   setNumQs(play[play.length - 1].period);
-    //   // } else {
-    //   //   setNumQs(4);
-    //   // }
-    //   // setLastAction(play[play.length - 1])
-    //   // setPlayByPlay(play);
-    //   // processPlayData(play);
-    // })
   }, [gameId]);
 
   useEffect(() => {
@@ -190,12 +169,8 @@ export default function App() {
       setHomeActions([]);
       return [];
     }
-    let awayPlayers = {
-
-    };
-    let homePlayers = {
-  
-    };
+    let awayPlayers = {};
+    let homePlayers = {};
 
     let awayAssistActions = []
     let homeAssistActions = []
@@ -676,34 +651,4 @@ export default function App() {
       <Boxscore box={box}></Boxscore>
     </div>
   );
-}
-
-function timeToSeconds(time) {
-  // Convert time string in the format "PT12M00.00S" to seconds
-  const match = time.match(/PT(\d+)M(\d+)\.(\d+)S/);
-  
-  if (match) {
-    const minutes = parseInt(match[1] || 0);
-    const seconds = parseInt(match[2] || 0);
-    const milliseconds = parseInt(match[3] || 0);
-    return minutes * 60 + seconds + milliseconds / 100;
-  }
-  
-  return 0;
-}
-
-function sortActions(actions) {
-  return actions.slice().sort((a, b) => {
-    if (a.period < b.period) {
-      return -1;
-    } else if (a.period > b.period) {
-      return 1;
-    } else {
-      if (timeToSeconds(a.clock) > timeToSeconds(b.clock)) {
-        return -1;
-      } else {
-        return 1;
-      }
-    }
-  });
 }
