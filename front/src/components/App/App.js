@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { timeToSeconds, sortActions } from '../../utils';
+import { timeToSeconds, sortActions, filterActions, addAssistActions } from '../../utils';
 
 import Schedule from '../Schedule/Schedule';
 import Score from '../Score/Score';
@@ -207,7 +207,6 @@ export default function App() {
         playerName = a.description.slice(a.description.slice(0, nameLoc - 2).lastIndexOf(' ') + 1, nameLoc + a.playerName.length);
       }
 
-      // debugger;
       if (playerName) {
         if(a.teamId === awayTeamId) {
           if (!awayPlayers[playerName]) {
@@ -245,18 +244,6 @@ export default function App() {
         on: false,
       };
     });
-    // Object.keys(awayPlayers).forEach(player => {
-    //   awayPlayers[player].forEach(action => {
-    //     if (action.actionType === 'Substitution') {
-
-    //     } else {
-    //       if (awayPlaytimes[player].on === false) {
-    //         awayPlaytimes[player].on = true;
-            
-    //       }
-    //     }
-    //   });
-    // });
 
     let currentQ = 1;
     data.forEach(a => {
@@ -478,121 +465,20 @@ export default function App() {
     });
     setAwayPlayerTimeline(awayPlaytimes);
     setHomePlayerTimeline(homePlaytimes);
-
-
-
     setScoreTimeline(scoreTimeline);
 
-    awayAssistActions.forEach(a => {
-      let startName = a.description.lastIndexOf('(') + 1;
-      let lastSpace = a.description.lastIndexOf(' ');
-      let endName = startName + a.description.slice(startName, lastSpace).lastIndexOf(' ');
-      let name = a.description.slice(startName, endName);
-      if (name === 'Porter' && a.teamTricode === 'CLE') {
-        name = "Porter Jr."
-      }
-      // if (name.includes(' ') && name.split(' ')[1] !== 'Jr.' && name.split(' ')[1].length > 3) {
-      //   name = name.split(' ')[1];
-      // }
-      if (awayPlayers[name] === undefined) {
-        awayPlayers[name] = [];
-      }
-      awayPlayers[name].push({
-        actionType: 'Assist',
-        clock: a.clock,
-        description: a.description.slice(startName, -1),
-        actionId: a.actionId ? a.actionId + 'a' : a.actionNumber + 'a',
-        actionNumber: a.actionNumber + 'a',
-        teamId: a.teamId,
-        scoreHome: a.scoreHome,
-        scoreAway: a.scoreAway,
-        personId: awayPlayers[name][0]?.personId,
-        playerName: awayPlayers[name][0]?.playerName,
-        playerNameI: awayPlayers[name][0]?.playerNameI,
-        period: a.period
-      });
-    });
-
-    homeAssistActions.forEach(a => {
-      let startName = a.description.lastIndexOf('(') + 1;
-      let lastSpace = a.description.lastIndexOf(' ');
-      let endName = startName + a.description.slice(startName, lastSpace).lastIndexOf(' ');
-      let name = a.description.slice(startName, endName);
-      if (name === 'Porter' && a.teamTricode === 'CLE') {
-        name = "Porter Jr."
-      }
-      // if (name.includes(' ') && name.split(' ')[1] !== 'Jr.' && name.split(' ')[1].length > 3) {
-      //   name = name.split(' ')[1];
-      // }
-      homePlayers[name].push({
-        actionType: 'Assist',
-        clock: a.clock,
-        description: a.description.slice(startName, -1),
-        actionId: a.actionId ? a.actionId + 'a' : a.actionNumber + 'a',
-        actionNumber: a.actionNumber + 'a',
-        teamId: a.teamId,
-        scoreHome: a.scoreHome,
-        scoreAway: a.scoreAway,
-        personId: homePlayers[name][0]?.personId,
-        playerName: homePlayers[name][0]?.playerName,
-        playerNameI: homePlayers[name][0]?.playerNameI,
-        period: a.period
-      })
-    });
-
+    awayAssistActions.forEach((a) => addAssistActions(a, awayPlayers));
+    homeAssistActions.forEach((a) => addAssistActions(a, homePlayers));
+    
     let allAct = [];
-
-    Object.entries(awayPlayers).forEach(([k, v]) => {
-      allAct = [...allAct, ...v];
-      let filterPlayer = [];
-      for (let pI = 0; pI < v.length; pI += 1) {
-        let a = v[pI];
-        if (a.description.includes('PTS') && statOn[0]) {
-          filterPlayer.push(a); 
-        } else if (a.description.includes('MISS') && statOn[1]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('REBOUND') && statOn[2]) {
-          filterPlayer.push(a);
-        } else if (a.actionType === 'Assist' && statOn[3]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('TO)') && statOn[4]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('BLK') && statOn[5]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('STL') && statOn[6]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('PF)') && statOn[7]) {
-          filterPlayer.push(a);
-        } 
-      }
-      awayPlayers[k] = filterPlayer;
+    Object.entries(awayPlayers).forEach(([name, actions]) => {
+      allAct = [...allAct, ...actions];
+      awayPlayers[name] = awayPlayers[name].filter((a) => filterActions(a, statOn));
     });
-    Object.entries(homePlayers).forEach(([k, v]) => {
-      allAct = [...allAct, ...v];
-      let filterPlayer = [];
-      for (let pI = 0; pI < v.length; pI += 1) {
-        let a = v[pI];
-        if (a.description.includes('PTS') && statOn[0]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('MISS') && statOn[1]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('REBOUND') && statOn[2]) {
-          filterPlayer.push(a);
-        } else if (a.actionType === 'Assist' && statOn[3]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('TO)') && statOn[4]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('BLK') && statOn[5]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('STL') && statOn[6]) {
-          filterPlayer.push(a);
-        } else if (a.description.includes('PF)') && statOn[7]) {
-          filterPlayer.push(a);
-        } 
-      }
-      homePlayers[k] = filterPlayer;
+    Object.entries(homePlayers).forEach(([name, actions]) => {
+      allAct = [...allAct, ...actions];
+      homePlayers[name] = homePlayers[name].filter((a) => filterActions(a, statOn));
     });
-
     allAct = sortActions(allAct);
 
     setAllActions(allAct);
