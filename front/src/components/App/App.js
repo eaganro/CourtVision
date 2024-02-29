@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { timeToSeconds, sortActions, filterActions, addAssistActions } from '../../utils';
+import { timeToSeconds, sortActions, filterActions, addAssistActions, processScoreTimeline, fixPlayerName } from '../../utils';
 
 import Schedule from '../Schedule/Schedule';
 import Score from '../Score/Score';
@@ -169,43 +169,14 @@ export default function App() {
       setHomeActions([]);
       return [];
     }
+    setScoreTimeline(processScoreTimeline(data));
+
     let awayPlayers = {};
     let homePlayers = {};
 
-    let awayAssistActions = []
-    let homeAssistActions = []
-
-    let scoreTimeline = [];
-    let sAway = '0';
-    let sHome = '0';
     data.forEach(a => {
-      if (a.scoreAway !== '') {
-        if (a.scoreAway !== sAway) {
-          scoreTimeline.push({
-            away: a.scoreAway,
-            home: a.scoreHome,
-            clock: a.clock,
-            period: a.period
-          });
-          sAway = a.scoreAway;
-        }
-        if (a.scoreHome !== sHome) {
-          scoreTimeline.push({
-            away: a.scoreAway,
-            home: a.scoreHome,
-            clock: a.clock,
-            period: a.period
-          });
-          sHome = a.scoreHome;
-        }
-      }
 
-      let playerName = a.playerName;
-
-      let nameLoc = a.description.indexOf(a.playerName);
-      if (nameLoc > 0 && a.description[nameLoc - 2] === '.') {
-        playerName = a.description.slice(a.description.slice(0, nameLoc - 2).lastIndexOf(' ') + 1, nameLoc + a.playerName.length);
-      }
+      let playerName = fixPlayerName(a);
 
       if (playerName) {
         if(a.teamId === awayTeamId) {
@@ -215,7 +186,7 @@ export default function App() {
             awayPlayers[playerName].push(a);
           }
           if (a.description.includes('AST')) {
-            awayAssistActions.push(a);
+            addAssistActions(a, awayPlayers);
           }
         } else if(a.teamId === homeTeamId) {
           if (!homePlayers[playerName]) {
@@ -224,7 +195,7 @@ export default function App() {
             homePlayers[playerName].push(a);
           }
           if (a.description.includes('AST')) {
-            homeAssistActions.push(a);
+            addAssistActions(a, homePlayers);
           }
         }
       }
@@ -248,12 +219,7 @@ export default function App() {
     let currentQ = 1;
     data.forEach(a => {
 
-      let playerName = a.playerName;
-
-      let nameLoc = a.description.indexOf(a.playerName);
-      if (nameLoc > 0 && a.description[nameLoc - 2] === '.') {
-        playerName = a.description.slice(a.description.slice(0, nameLoc - 2).lastIndexOf(' ') + 1, nameLoc + a.playerName.length);
-      }
+      let playerName = fixPlayerName(a);
 
       if(a.teamId === awayTeamId) {
         if(a.period !== currentQ) {
@@ -465,11 +431,7 @@ export default function App() {
     });
     setAwayPlayerTimeline(awayPlaytimes);
     setHomePlayerTimeline(homePlaytimes);
-    setScoreTimeline(scoreTimeline);
 
-    awayAssistActions.forEach((a) => addAssistActions(a, awayPlayers));
-    homeAssistActions.forEach((a) => addAssistActions(a, homePlayers));
-    
     let allAct = [];
     Object.entries(awayPlayers).forEach(([name, actions]) => {
       allAct = [...allAct, ...actions];

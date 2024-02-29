@@ -12,6 +12,44 @@ export function timeToSeconds(time) {
   return 0;
 }
 
+export function fixPlayerName(a) {
+  let playerName = a.playerName;
+  let nameLoc = a.description.indexOf(a.playerName);
+  if (nameLoc > 0 && a.description[nameLoc - 2] === '.') {
+    playerName = a.description.slice(a.description.slice(0, nameLoc - 2).lastIndexOf(' ') + 1, nameLoc + a.playerName.length);
+  }
+  return playerName;
+}
+
+export function processScoreTimeline(data) {
+  const scoreTimeline = [];
+  let sAway = '0';
+  let sHome = '0';
+  data.forEach(a => {
+    if (a.scoreAway !== '') {
+      if (a.scoreAway !== sAway) {
+        scoreTimeline.push({
+          away: a.scoreAway,
+          home: a.scoreHome,
+          clock: a.clock,
+          period: a.period
+        });
+        sAway = a.scoreAway;
+      }
+      if (a.scoreHome !== sHome) {
+        scoreTimeline.push({
+          away: a.scoreAway,
+          home: a.scoreHome,
+          clock: a.clock,
+          period: a.period
+        });
+        sHome = a.scoreHome;
+      }
+    }
+  });
+  return scoreTimeline;
+}
+
 export function addAssistActions(a, players) {
   let startName = a.description.lastIndexOf('(') + 1;
   let lastSpace = a.description.lastIndexOf(' ');
