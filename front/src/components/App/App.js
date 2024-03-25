@@ -9,6 +9,8 @@ import Boxscore from '../Boxscore/Boxscore';
 import Play from '../Play/Play';
 import StatButtons from '../StatButtons/StatButtons';
 
+import { wsLocation } from '../../environment';
+
 import './App.scss';
 export default function App() {
 
@@ -54,8 +56,7 @@ export default function App() {
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    // const newWs = new WebSocket('wss://roryeagan.com/nba/wss');
-    const newWs = new WebSocket('ws://localhost:3001');
+    const newWs = new WebSocket(wsLocation);
     setWs(newWs);
 
     newWs.onopen = () => {
