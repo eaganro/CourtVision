@@ -8,16 +8,12 @@ import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json
 import * as cheerio from 'cheerio';
 import { query } from 'express';
 
+import databaseCreds from './databaseCreds.js';
 
 
 
-const pool = new Pool({
-  user: 'test',
-  host: 'localhost',
-  database: 'nbavis',
-  password: 'test',
-  port: 5432,
-});
+
+const pool = new Pool(databaseCreds);
 
 // pool.query('SELECT NOW()', (err, res) => {
 //   console.log(err, res);
