@@ -33,7 +33,7 @@
     background-color: rgb(240, 240, 240);
     border-radius: 15px;
     padding: 0 5px;
-    margin-right: 20px;
+    margin-right: 5px;
 
     white-space: nowrap;
     &:hover {
@@ -44,10 +44,13 @@
     .iconRow {
       display: flex;
       align-items: center;
+      height: 21px;
     }
     .recordRow {
       display: flex;
       justify-content: space-evenly;
+      height: 21px;
+      font-size: 10px;
     }
   }
 }
