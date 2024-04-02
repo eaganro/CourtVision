@@ -15,7 +15,7 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
     freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
     assists: 0, steals: 0, blocks: 0, turnovers: 0, foulsPersonal: 0, points: 0, plusMinusPoints:0 };
 
-  const leftCol = [<div className="statHeadings"><span>PLAYER</span></div>];
+  let leftCol = [<div className="statHeadings"><span>PLAYER</span></div>];
   let teamBox = team.players.filter(p => {
     let minutes = p.statistics.minutes;
     if (!minutes) return false;
@@ -35,11 +35,7 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
     let [amin, asec] = minutesA.split(':');
     let [bmin, bsec] = minutesB.split(':');
     return (bmin * 100 + bsec) - (amin * 100 + asec);
-  })
-  if (!showMore) {
-    teamBox = teamBox.slice(0, 5);
-  }
-  teamBox = teamBox.map((p, i) => {
+  }).map((p, i) => {
     Object.keys(teamTotals).forEach(k => {
       teamTotals[k] += p.statistics[k];
     });
@@ -73,6 +69,10 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
       </div>
     )
   });
+  if (!showMore) {
+    teamBox = teamBox.slice(0, 5);
+    leftCol = leftCol.slice(0, 6)
+  }
   leftCol.push(<div className={teamBox.length % 2 === 0 ? 'even' : 'odd'}><span className="playerNameCol">TEAM</span></div>)
 
   let fg;
