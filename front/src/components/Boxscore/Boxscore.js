@@ -1,8 +1,13 @@
 import './Boxscore.scss';
 import processTeamStats from './processTeamStats';
+import { useState } from 'react';
+
+
 export default function Boxscore({ box }) {
-  const awayBox = processTeamStats(box?.awayTeam)
-  const homeBox = processTeamStats(box?.homeTeam)
+  const [showMore, setShowMore] = useState(false);
+
+  const awayBox = processTeamStats(box?.awayTeam, false, showMore)
+  const homeBox = processTeamStats(box?.homeTeam, true, showMore, setShowMore)
 
   return (
     <div className='box'>

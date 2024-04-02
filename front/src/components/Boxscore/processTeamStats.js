@@ -1,11 +1,14 @@
-export default function(team) {
+import { UnfoldMore, UnfoldLess } from '@mui/icons-material';
+import IconButton from '@mui/material/IconButton';
+
+export default function(team, showButton, showMore, setShowMore) {
   if (!team) return ''
   const teamTotals = { fieldGoalsMade: 0, fieldGoalsAttempted: 0, threePointersMade: 0, threePointersAttempted: 0,
     freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
     assists: 0, steals: 0, blocks: 0, turnovers: 0, foulsPersonal: 0, points: 0, plusMinusPoints:0 };
 
   const leftCol = [<div className="statHeadings"><span>PLAYER</span></div>];
-  const teamBox = team.players.filter(p => {
+  let teamBox = team.players.filter(p => {
     let minutes = p.statistics.minutes;
     if (!minutes) return false;
     if (minutes.includes('PT')) {
@@ -24,7 +27,11 @@ export default function(team) {
     let [amin, asec] = minutesA.split(':');
     let [bmin, bsec] = minutesB.split(':');
     return (bmin * 100 + bsec) - (amin * 100 + asec);
-  }).map((p, i) => {
+  })
+  if (!showMore) {
+    teamBox = teamBox.slice(0, 5);
+  }
+  teamBox = teamBox.map((p, i) => {
     Object.keys(teamTotals).forEach(k => {
       teamTotals[k] += p.statistics[k];
     });
@@ -145,6 +152,7 @@ export default function(team) {
         <div className="team">
           {team ? <img height="30" width="30" src={`img/teams/${team?.teamTricode}.png`}></img> : ''}
           <span>{team?.teamName}</span>
+          {showButton && <div className='showMore' onClick={() => setShowMore(!showMore)}><IconButton onClick={() =>{}}>{showMore ? <UnfoldLess /> : <UnfoldMore />}</IconButton></div>}
         </div>
       </div>
       <div className="fullTeam">

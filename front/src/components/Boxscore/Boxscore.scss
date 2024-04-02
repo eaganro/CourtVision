@@ -51,7 +51,7 @@
   }
   .leftCol {
     flex-basis: 200px;
-    flex-shrink: 0.5;
+    flex-shrink: 0;
     flex-grow: 0;
     display: flex;
     flex-direction: column;
@@ -60,6 +60,11 @@
   .scrollCols {
     overflow-x: auto;
     flex-grow: 1;
+  }
+
+  .showMore {
+    position: absolute;
+    left: 50%;
   }
 
   // &::-webkit-scrollbar { 
