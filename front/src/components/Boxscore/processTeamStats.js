@@ -1,7 +1,15 @@
 import { UnfoldMore, UnfoldLess } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
+import { useRef, useEffect } from 'react';
 
-export default function(team, showButton, showMore, setShowMore) {
+export default function(team, showButton, showMore, setShowMore, scrollPos, setScrollPos) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.scrollLeft = scrollPos;
+    }
+  }, [scrollPos]);
+  
   if (!team) return ''
   const teamTotals = { fieldGoalsMade: 0, fieldGoalsAttempted: 0, threePointersMade: 0, threePointersAttempted: 0,
     freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
@@ -159,7 +167,7 @@ export default function(team, showButton, showMore, setShowMore) {
         <div className="leftCol">
           {leftCol}
         </div>
-        <div className="scrollCols">
+        <div ref={ref} className="scrollCols" onScroll={e => setScrollPos(e.target.scrollLeft)}>
           {teamBox}
         </div>
       </div>
