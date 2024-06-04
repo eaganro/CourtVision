@@ -59,7 +59,7 @@ let databaseInsertGame = async function(box) {
     status = EXCLUDED.status,
     homeRecord = EXCLUDED.homeRecord,
     awayRecord = EXCLUDED.awayRecord;`;
-    // console.log(query);
+    console.log(query);
   try{
     // console.log(await pool.query(query));
     await pool.query(query)

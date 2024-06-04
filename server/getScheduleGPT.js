@@ -26,8 +26,8 @@ async function fetchGamesForDate(date) {
   return hrefs;
 }
 
-async function getAllGamesForDays() {
-  let dates = ['2023-12-03', '2023-12-04', '2023-12-05', '2023-12-06', '2023-12-07', '2023-12-08', '2023-12-09', '2023-12-10']
+async function getAllGamesForDays(dates) {
+  // let dates = ['2023-12-03', '2023-12-04', '2023-12-05', '2023-12-06', '2023-12-07', '2023-12-08', '2023-12-09', '2023-12-10']
   // let dates = ['2023-12-04']
   let gamesByDate = {};
 
@@ -62,9 +62,24 @@ function getDatesForYears(years) {
   return dates;
 }
 
+function getGamesForMonths(year, months) {
+  let dates = [];
+  for (let month of months) {
+    let startDate = new Date(year, month, 1); // January 1st of the year
+    let endDate = new Date(year, month + 1, 0); // December 31st of the year
+
+    for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+      dates.push(new Date(date).toISOString().split('T')[0]); // Format as YYYY-MM-DD
+    }
+  }
+  return getAllGamesForDays(dates)
+  // return dates;
+}
+
 (async () => {
   // let gamesByDate = await getAllGamesForYears([2023, 2024]);
-  let gamesByDate = await getAllGamesForDays();
+  // let gamesByDate = await getAllGamesForDays();
+  let gamesByDate = await getGamesForMonths(2024, [3, 4, 5]);
 
   // Convert the object to JSON string
   const jsonContent = JSON.stringify(gamesByDate, null, 2);

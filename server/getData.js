@@ -48,39 +48,8 @@ import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json
     console.log(gameUrls);
     // const browser = await puppeteer.launch({headless: true});
     const browser = await puppeteer.launch({
-      // args: [
-      //   '--no-sandbox',
-      //   '--disable-setuid-sandbox',
-      //   '--disable-dev-shm-usage',
-      //   '--disable-accelerated-2d-canvas',
-      //   '--no-first-run',
-      //   '--no-zygote',
-      //   '--single-process',
-      //   '--disable-gpu'
-      // ],
-      // // executablePath: '/usr/bin/chromium',
-      args: [
-        '--headless',
-        '--no-sandbox',
-        '--disable-background-networking',
-        '--disable-default-apps',
-        '--disable-extensions',
-        '--disable-sync',
-        '--disable-translate',
-        '--hide-scrollbars',
-        '--metrics-recording-only',
-        '--mute-audio',
-        '--no-first-run',
-        '--safebrowsing-disable-auto-update',
-        '--ignore-certificate-errors',
-        '--ignore-ssl-errors',
-        '--ignore-certificate-errors-spki-list',
-        '--user-data-dir=/tmp',
-        '--remote-debugging-port=9222',
-        '--remote-debugging-address=0.0.0.0',
-        '--window-size=1920,1080',
-      ],
-      // headless: false
+      executablePath: '/usr/bin/chromium-browser',
+      headless: "new"
     });
     // let pages = [];
     gameUrls.forEach(async (game) => {
