@@ -34,6 +34,13 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      height: 65px;
+
+      .noGames {
+        color: #6c6d6f;
+        font-weight: 500;
+        margin: auto;
+      }
   
       .games {
         display: flex;

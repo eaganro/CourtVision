@@ -85,7 +85,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
 
   const dateDown = () => {
     const downdate = new Date(date);
-    downdate.setDate(downdate.getDate() - 1);
+    downdate.setDate(downdate.getDate());
     let month = downdate.getMonth() + 1;
     if (month < 10) {
       month = '0' + month;
@@ -102,7 +102,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
   }
   const dateUp = () => {
     const update = new Date(date);
-    update.setDate(update.getDate() + 1);
+    update.setDate(update.getDate() + 2);
     let month = update.getMonth() + 1;
     if (month < 10) {
       month = '0' + month;
@@ -134,9 +134,12 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
         </div>
         <div className='gamePick'>
           <IconButton className='scheduleButton' onClick={scrollScheduleLeft}><NavigateBefore /></IconButton>
-          <div className="games" ref={scrollRef}>
-            {gamesList}
-          </div>
+          {gamesList.length ?
+            <div className="games" ref={scrollRef}>
+              {gamesList}
+            </div> :
+            <div className='noGames'>No Games Today</div>
+          }
           <IconButton className='scheduleButton end' onClick={scrollScheduleRight}><NavigateNext /></IconButton>
         </div>
       </div>
