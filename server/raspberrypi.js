@@ -7,9 +7,8 @@ const app = express();
 const server = http.createServer(app);
 const port = 3000;
 
-// app.use(express.static('./public'));
+app.use(express.static('./public'));
 app.use((req, res, next) => {
-  console.log(req.url);
   req.url = req.url.replace(/\/\//g, '/');
   next();
 });
