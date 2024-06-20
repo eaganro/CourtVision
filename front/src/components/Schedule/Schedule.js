@@ -140,7 +140,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
             <div className="games" ref={scrollRef}>
               {gamesList}
             </div> :
-            <div className='noGames'>No Games Today</div>
+            <div className='noGames'>No Games Scheduled</div>
           }
           <IconButton className='scheduleButton end' onClick={scrollScheduleRight}><NavigateNext /></IconButton>
         </div>
