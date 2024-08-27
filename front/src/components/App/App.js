@@ -30,7 +30,7 @@ export default function App() {
   const [box, setBox] = useState({});
   const [playByPlay, setPlayByPlay] = useState([]);
   // const [gameId, setGameId] = useState("0022300216");
-  const [gameId, setGameId] = useState("0022300779");
+  const [gameId, setGameId] = useState("0042300405");
   const [awayTeamId, setAwayTeamId] = useState(null);
   const [homeTeamId, setHomeTeamId] = useState(null);
 
@@ -245,7 +245,8 @@ export default function App() {
         homeTeam={box?.homeTeam?.teamTricode}
         awayTeam={box?.awayTeam?.teamTricode}
         score={scoreTimeline[scoreTimeline.length - 1]}
-      ></Score>
+        date={box.gameEt}
+        changeDate={changeDate}></Score>
       <div className='playByPlaySection' ref = {playByPlaySectionRef}>
         <Play
           awayTeamNames={awayTeamName}

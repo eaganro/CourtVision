@@ -49,36 +49,43 @@ import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json
     // const browser = await puppeteer.launch({headless: true});
     const browser = await puppeteer.launch({
       executablePath: '/usr/bin/chromium-browser',
-      headless: "new"
+      headless: 'new'
     });
+    console.log('con', browser.isConnected())
+    browser.on('disconnected', () => console.log('disc'));
+
     // let pages = [];
     gameUrls.forEach(async (game) => {
       let gameId = game.url.slice(-10);
       if (gameId !== '0022300779') {
         console.log(gameId);
-        return;
+        // return;
       }
       let startTime = game.startTime;
       let fourHoursLater = new Date(startTime.getTime() + 4 * 60 * 60 * 1000);
       // schedule.scheduleJob((new Date), async () => {
         const page = await browser.newPage();
         await page.setDefaultNavigationTimeout(0);
-        await page.setRequestInterception(true);
+        // await page.setRequestInterception(true);
+        // console.log('asdfadsgasgasgd', page.isClosed())
+        // console.log('page', page.url())
         let lastActionIndex = -1;
         console.log('1', gameId)
         let firstTime = true;
         // pages.push(page);
 
-        page.on('request', (req) => {
-          if(req.resourceType() == 'stylesheet' || req.resourceType() == 'font' || req.resourceType() == 'image'){
-            req.abort();
-          }
-          else {
-              req.continue();
-          }
-        });
+        // page.on('request', (req) => {
+        //   if(req.resourceType() == 'stylesheet' || req.resourceType() == 'font' || req.resourceType() == 'image'){
+        //     req.abort();
+        //   }
+        //   else {
+        //       req.continue();
+        //   }
+        // });
         page.on('response', async (response) => {
+          // console.log('asdf')
           if (response.url().includes('playbyplay')) {
+            console.log('play')
             try {
               const actions = (await response.json())?.game?.actions;
               fs.writeFileSync(`public/data/playByPlayData/${gameId}.json`, JSON.stringify(actions), 'utf8');
@@ -99,6 +106,7 @@ import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json
             // });
           }
           if (response.url().includes('boxscore')) {
+            console.log('box')
             if (response.ok()) {
               const box = (await response.json())?.game;
               fs.writeFileSync(`public/data/boxData/${gameId}.json`, JSON.stringify(box), 'utf8');
@@ -108,8 +116,10 @@ import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json
           }
         });
         console.log(`https://www.nba.com/game/${game.url}`)
-        await page.goto(`https://www.nba.com/game/${game.url}`);
-
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36');
+        await page.goto(`https://www.nba.com/game/${game.url}/box-score`);
+        // await page.goto(`https://roryeagan.com/nba`);
+        console.log('after')
         // schedule.scheduleJob(fourHoursLater, () => {
         //   page.close(); // close the page
         // });

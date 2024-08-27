@@ -1,6 +1,8 @@
 import { useRef } from 'react';
 import { NavigateNext, NavigateBefore } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
+import { dateAdd, dateMinus } from '../../environment';
+
 
 import './Schedule.scss';
 
@@ -85,7 +87,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
 
   const dateDown = () => {
     const downdate = new Date(date);
-    downdate.setDate(downdate.getDate() - 1);
+    downdate.setDate(downdate.getDate() - dateMinus);
     let month = downdate.getMonth() + 1;
     if (month < 10) {
       month = '0' + month;
@@ -102,7 +104,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
   }
   const dateUp = () => {
     const update = new Date(date);
-    update.setDate(update.getDate() + 1);
+    update.setDate(update.getDate() + dateAdd);
     let month = update.getMonth() + 1;
     if (month < 10) {
       month = '0' + month;
@@ -134,9 +136,12 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
         </div>
         <div className='gamePick'>
           <IconButton className='scheduleButton' onClick={scrollScheduleLeft}><NavigateBefore /></IconButton>
-          <div className="games" ref={scrollRef}>
-            {gamesList}
-          </div>
+          {gamesList.length ?
+            <div className="games" ref={scrollRef}>
+              {gamesList}
+            </div> :
+            <div className='noGames'>No Games Scheduled</div>
+          }
           <IconButton className='scheduleButton end' onClick={scrollScheduleRight}><NavigateNext /></IconButton>
         </div>
       </div>
