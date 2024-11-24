@@ -51,7 +51,7 @@ import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json
       executablePath: '/usr/bin/chromium-browser',
       headless: 'new'
     });
-    console.log('con', browser.isConnected())
+    console.log('con', browser.connected)
     browser.on('disconnected', () => console.log('disc'));
 
     // let pages = [];

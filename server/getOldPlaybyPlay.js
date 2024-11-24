@@ -7,6 +7,8 @@ import database from './database.js';
 
 let requestList = [];
 const today = new Date();
+// const start = new Date(2024, 11, 30);
+// const end = new Date(2025, 0, 1);
 Object.entries(gamesObj).forEach(([k,v]) => {
   if (today > new Date(k)) {
     v.forEach(gameId => {
@@ -91,10 +93,10 @@ requestList.forEach(async (r, i) =>{
   const gameIdNums = gameId.slice(-10);
   console.log(`${i} - ${gameId}`);
 
-  let boxStat, playStat;
+  // let boxStat, playStat;
   try {
-    boxStat = await fsp.stat(`public/data/boxData/${gameIdNums}.json`);
-    playStat = await fsp.stat(`public/data/playByPlayData/${gameIdNums}.json`);
+    // boxStat = await fsp.stat(`public/data/boxData/${gameIdNums}.json`);
+    // playStat = await fsp.stat(`public/data/playByPlayData/${gameIdNums}.json`);
     let box = JSON.parse(await fsp.readFile(`public/data/boxData/${gameIdNums}.json`));
     if (!box.gameStatusText.startsWith('Final')) {
       fetchFunc(gameId, i);

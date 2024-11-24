@@ -28,5 +28,5 @@ function getDatesForYears(years) {
 }
 
 // Generate dates for 2023 and 2024
-// let dateList = getDatesForYears([2023, 2024]);
-// console.log(dateList);
+let dateList = getDatesForYears([2024]);
+console.log(dateList);

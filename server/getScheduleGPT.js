@@ -79,7 +79,7 @@ function getGamesForMonths(year, months) {
 (async () => {
   // let gamesByDate = await getAllGamesForYears([2023, 2024]);
   // let gamesByDate = await getAllGamesForDays();
-  let gamesByDate = await getGamesForMonths(2024, [3, 4, 5]);
+  let gamesByDate = await getGamesForMonths(2024, [9,10,11]);
 
   // Convert the object to JSON string
   const jsonContent = JSON.stringify(gamesByDate, null, 2);
