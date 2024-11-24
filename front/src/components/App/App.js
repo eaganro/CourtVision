@@ -3,6 +3,7 @@ import { fixPlayerName } from '../../utils';
 import { sortActions, filterActions, processScoreTimeline, createPlayers,
   createPlaytimes, updatePlaytimesWithAction, quarterChange, endPlaytimes } from '../../dataProcessing';
 
+
 import Schedule from '../Schedule/Schedule';
 import Score from '../Score/Score';
 import Boxscore from '../Boxscore/Boxscore';
@@ -30,7 +31,7 @@ export default function App() {
   const [box, setBox] = useState({});
   const [playByPlay, setPlayByPlay] = useState([]);
   // const [gameId, setGameId] = useState("0022300216");
-  const [gameId, setGameId] = useState("0042300405");
+  const [gameId, setGameId] = useState("0022400104");
   const [awayTeamId, setAwayTeamId] = useState(null);
   const [homeTeamId, setHomeTeamId] = useState(null);
 
@@ -118,6 +119,7 @@ export default function App() {
 
   useEffect(() => {
     if (ws && ws.readyState === 1) {
+      console.log('hereasdf')
       ws.send(JSON.stringify({ type: 'gameId', gameId }));
     } else {
       console.log('no ws');
