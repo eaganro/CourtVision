@@ -65,8 +65,8 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
             <img height="16" width="16" src={`img/teams/${g.hometeam}.png`}></img>
           </div>
           <div class="recordRow">
-            <span>{g.awayrecord}</span>
-            <span>{g.homerecord}</span>
+            {/* <span>{g.awayrecord}</span>
+            <span>{g.homerecord}</span> */}
           </div>
           <div>{g.status}</div>
         </div>
