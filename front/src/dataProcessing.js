@@ -35,7 +35,10 @@ export function addAssistActions(a, players) {
   let endName = startName + a.description.slice(startName, lastSpace).lastIndexOf(' ');
   let name = a.description.slice(startName, endName);
   if (name === 'Porter' && a.teamTricode === 'CLE') {
-    name = "Porter Jr."
+    name = "Porter Jr.";
+  }
+  if (name === 'Jokic') {
+    name = "Jokić";
   }
   // if (name.includes(' ') && name.split(' ')[1] !== 'Jr.' && name.split(' ')[1].length > 3) {
   //   name = name.split(' ')[1];
@@ -119,6 +122,9 @@ export function createPlayers(actions, awayTeamId, homeTeamId) {
           if (name === 'Porter' && a.teamTricode === 'CLE') {
             name = "Porter Jr."
           }
+          if (name === 'Jokic') {
+            name = "Jokić";
+          }
           if (awayPlayers[name] === undefined) {
             awayPlayers[name] = [];
           }
@@ -138,6 +144,9 @@ export function createPlayers(actions, awayTeamId, homeTeamId) {
           let name = a.description.slice(startName, endName);
           if (name === 'Porter' && a.teamTricode === 'CLE') {
             name = "Porter Jr."
+          }
+          if (name === 'Jokic') {
+            name = "Jokić";
           }
           if (homePlayers[name] === undefined) {
             homePlayers[name] = [];
@@ -168,6 +177,9 @@ export function updatePlaytimesWithAction(a, playtimes) {
     let name = a.description.slice(startName, endName);
     if (name === 'Porter' && a.teamTricode === 'CLE') {
       name = "Porter Jr."
+    }
+    if (name === 'Jokic') {
+      name = "Jokić"
     }
     if(playtimes[name]) {
       playtimes[name].times.push({ start: a.clock, period: a.period });
