@@ -3,22 +3,11 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
 
   const playerName = name;
 
-  const dotActions = {
-    'Made Shot': 1,
-    'Missed Shot': 1,
-    'Rebound': 1,
-    'Missed Shot': 1,
-    'Foul': 1,
-    'Turnover': 1,
-    'Free Throw': 1,
-  }
-
   let qWidth = width / 4;
   if (numQs > 4) {
     qWidth = width * (12 / (12 * 4 + 5 * (numQs - 4)))
   }
 
-  // console.log(actions.filter(a => a.actionType === 'Substitution'));
   let dots = actions
   .filter(a => a.actionType !== 'Substitution' && a.actionType !== 'Jump Ball' && a.actionType !==  'Violation')
   .map(a => {

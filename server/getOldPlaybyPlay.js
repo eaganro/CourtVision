@@ -7,10 +7,12 @@ import database from './database.js';
 
 let requestList = [];
 const today = new Date();
-// const start = new Date(2024, 11, 30);
-// const end = new Date(2025, 0, 1);
+// const today = new Date(2025, 1, 15);
+const start = new Date(2025, 2, 6);
+const end = new Date(2025, 2, 30);
 Object.entries(gamesObj).forEach(([k,v]) => {
-  if (today > new Date(k)) {
+  if (today > new Date(k) && new Date(2025, 1, 30) < new Date(k)) {
+  // if (new Date(k) >= start && new Date(k) < end) {
     v.forEach(gameId => {
       requestList.push([gameId, Math.random(), k])
     });
@@ -57,7 +59,10 @@ const fetchFunc = function(gameId, i) {
       if (obj === null){
         fetchFunc(gameId, i);
       } else {
-        const playByPlay = obj.props.pageProps.playByPlay.actions;
+        const playByPlay = obj.props.pageProps.playByPlay?.actions;
+	if (playByPlay === undefined) {
+		return;
+	}
         const box = obj.props.pageProps.game;
         database.insertGame(box);
         makeFile(playByPlay, box, gameId.slice(-10));
@@ -70,6 +75,7 @@ const fetchFunc = function(gameId, i) {
 
 const makeFile = function(playByPlay, box, gameId) {
   // if (playByPlay.length) {
+    gameId = gameId.replace(/\//g, '');
     fs.writeFile(`public/data/playByPlayData/${gameId}.json`, JSON.stringify(playByPlay), function (err) {
       if (err) throw err;
       console.log('Saved!');

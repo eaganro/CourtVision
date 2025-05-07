@@ -4,7 +4,7 @@ import schedule from 'node-schedule';
 import database from './database.js';
 import myEmitter from './eventEmitter.js';
 
-// schedule.scheduleJob('48 16 * * *', async () => {
+// schedule.scheduleJob('15 05 * * *', async () => {
   const today = new Date();
   let month = today.getMonth() + 1;
   if (month < 10) {
@@ -36,6 +36,7 @@ import myEmitter from './eventEmitter.js';
         let startTime = new Date(game.starttime)
         console.log(gameUrl, startTime)
         // schedule.scheduleJob(startTime, async () => {
+          console.log('GAME START: ' + gameUrl)
           const page = await browser.newPage();
           await page.setDefaultNavigationTimeout(0);
 
