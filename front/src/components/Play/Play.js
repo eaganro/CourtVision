@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { timeToSeconds } from '../../utils';
 // import getWindowDimensions from '../hooks/windowDimensions';
 
 import Player from './Player/Player';
@@ -172,26 +173,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     }
   }
 
-
-  // let startx = 0;
-  // let starty = 0;
-  // const timeline = scoreTimeline.map((t, i) => {
-  //   let x1 = startx;
-  //   let x2 = (((t.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
-  //   if (t.period > 4) {
-  //     x2 = ((4 * 12 * 60 + 5 * (t.period - 4) * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
-  //   }
-  //   startx = x2;
-
-  //   let y1 = starty;
-  //   let y2 = t.scoreDiff * - 300 / maxY;
-  //   starty = y2;
-  //   return ([
-  //     <line period={t.period} key={'one' + i} x1={leftMargin + x1} y1={300 + y1} x2={leftMargin + x2} y2={300 + y1} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />,
-  //     <line period={t.period} key={'two' + i} x1={leftMargin + x2} y1={300 + y1} x2={leftMargin + x2} y2={300 + y2} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />
-  //   ])
-  // }).flat();
-
   const timeline = [];
   // timeline.push(<line key={'secondLast'} x1={leftMargin + startx} y1={300 + starty} x2={leftMargin + width} y2={300 + starty} style={{ stroke: 'rgb(255,0,0)', strokeWidth:2 }} />)
   timeline.unshift(<line key={'Last'} x1={0} y1={300} x2={leftMargin + width} y2={300} style={{ stroke: 'black', strokeWidth:1 }} />)
@@ -221,9 +202,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     lineJump = 20;
   }
 
-  let lineLabelStyle = {
-    // textAlign: 'right',
-  };
   for (let i = 0; i < numLines; i += 1) {
     let posy = 300 + ((i + 1) * lineJump) * - 300 / maxY
     timeline.unshift(<line key={`sp${i}-${awayTeamName}-${homeTeamName}`} x1={leftMargin - 5} y1={posy} x2={leftMargin + width} y2={posy} strokeDasharray={"5,5"} style={{ stroke: 'darkgrey', strokeWidth: 0.5 }} />)
@@ -279,10 +257,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       } else {
         setMouseLinePos(pos + leftMargin);
       }
-
-
-      // setShowMouse(false);
-      // setTimeout(() => setShowMouse(true), 200);
     }
   }
 
@@ -316,20 +290,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       </div>
     </div>
   );
-}
-
-function timeToSeconds(time) {
-  // Convert time string in the format "PT12M00.00S" to seconds
-  const match = time.match(/PT(\d+)M(\d+)\.(\d+)S/);
-  
-  if (match) {
-    const minutes = parseInt(match[1] || 0);
-    const seconds = parseInt(match[2] || 0);
-    const milliseconds = parseInt(match[3] || 0);
-    return minutes * 60 + seconds + milliseconds / 100;
-  }
-  
-  return 0;
 }
 
 function rgbToRgba(rgb, a) {

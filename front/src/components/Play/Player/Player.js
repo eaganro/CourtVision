@@ -1,3 +1,5 @@
+import { timeToSeconds } from '../../../utils';
+
 import './Player.scss';
 export default function Player({ actions, timeline, name, width, numQs, heightDivide, highlight, leftMargin }) {
 
@@ -34,7 +36,6 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
       color = 'black';
     }
     let style = {
-      // left: `${pos - 0}px`,
       backgroundColor: color
     };
     if (highlight.includes(a.actionId)) {
@@ -95,18 +96,4 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
       </svg>
     </div>
   );
-}
-
-function timeToSeconds(time) {
-  // Convert time string in the format "PT12M00.00S" to seconds
-  const match = time.match(/PT(\d+)M(\d+)\.(\d+)S/);
-  
-  if (match) {
-    const minutes = parseInt(match[1] || 0);
-    const seconds = parseInt(match[2] || 0);
-    const milliseconds = parseInt(match[3] || 0);
-    return minutes * 60 + seconds + milliseconds / 100;
-  }
-  
-  return 0;
 }

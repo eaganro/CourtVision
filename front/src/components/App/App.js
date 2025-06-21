@@ -56,11 +56,6 @@ export default function App() {
 
   const [ws, setWs] = useState(null);
 
-  // const gameRef = useRef(gameId);
-  // const dateRef = useRef(date);
-  // useEffect(() => { gameRef.current = gameId }, [gameId]);
-  // useEffect(() => { dateRef.current = date }, [date]);
-
   const connect = () => {
     if (ws?.readyState === WebSocket.OPEN || ws?.readyState === WebSocket.CONNECTING) {
       return;
