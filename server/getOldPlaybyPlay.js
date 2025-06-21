@@ -5,6 +5,22 @@ import * as cheerio from 'cheerio';
 import database from './database.js';
 
 
+import { gzip } from 'zlib';
+import { promisify } from 'util';
+const gzipAsync = promisify(gzip);
+
+import {
+  DynamoDBClient
+} from "@aws-sdk/client-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand
+} from "@aws-sdk/lib-dynamodb";
+
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+
 let requestList = [];
 const today = new Date();
 // const today = new Date(2025, 1, 15);
