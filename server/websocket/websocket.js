@@ -2,7 +2,7 @@ import { WebSocketServer } from 'ws';
 import fsp from 'fs/promises';
 
 import database from './database.js';
-import myEmitter from './eventEmitter.js';
+import myEmitter from '../eventEmitter.js';
 
 
 const wss = new WebSocketServer({ port: 3001 });

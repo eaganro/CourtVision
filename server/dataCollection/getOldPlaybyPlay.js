@@ -1,8 +1,8 @@
-import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json' };
+import gamesObj from '../public/data/schedule/schedule.json' assert { type: 'json' };
 import * as fs from 'fs';
 import fsp from 'fs/promises';
 import * as cheerio from 'cheerio';
-import database from './database.js';
+import database from '../database.js';
 
 
 let requestList = [];

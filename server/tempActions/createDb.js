@@ -1,6 +1,6 @@
 import pkg from 'pg';
 const { Pool } = pkg;
-import databaseCreds from './databaseCreds.js';
+import databaseCreds from '../databaseCreds.js';
 
 const pool = new Pool(databaseCreds);
 

@@ -1,4 +1,4 @@
-import database from './database.js';
+import database from '../database.js';
 import fsp from 'fs/promises';
 
 (async function() {

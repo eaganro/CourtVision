@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import puppeteer from 'puppeteer';
 import schedule from 'node-schedule';
-import database from './database.js';
-import myEmitter from './eventEmitter.js';
+import database from '../database.js';
+import myEmitter from '../eventEmitter.js';
 
 // schedule.scheduleJob('15 05 * * *', async () => {
   const today = new Date();
