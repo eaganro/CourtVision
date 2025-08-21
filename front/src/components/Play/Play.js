@@ -13,6 +13,8 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const [showMouse, setShowMouse] = useState(true);
   const [mouseLinePos, setMouseLinePos] = useState(null);
   const [highlightActionIds, setHighlightActionIds] = useState([]);
+  const [infoLocked, setInfoLocked] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const leftMargin = 120;
 
@@ -213,16 +215,34 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   }
 
 
-  const descriptionList = descriptionArray.map(a => (<div>{a.description}</div>));
-  descriptionArray[0] && descriptionArray[0] && descriptionList.unshift(<div>{descriptionArray[0].clock} - {descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</div>)
+  const descriptionList = descriptionArray.map((a, index) => (
+    <div key={index} className="action-item">
+      <div className="action-description">{a.description}</div>
+    </div>
+  ));
+  
+  if (descriptionArray[0]) {
+    const time = descriptionArray[0].clock;
+    const scoreAway = descriptionArray[0].scoreAway;
+    const scoreHome = descriptionArray[0].scoreHome;
+    descriptionList.unshift(
+      <div key="time-score" className="time-score-header">
+        <span className="time">{time}</span>
+        <span className="score">{scoreAway} - {scoreHome}</span>
+      </div>
+    );
+  }
   let mouseLine = null;
   const mouseOver = (e) => {
-    if (showMouse) {
+    if (showMouse && !infoLocked) {
       let el = e.target;
       while (el.className !== 'play') {
         el = el.parentElement;
       }
       let pos = e.clientX - el.offsetLeft - leftMargin;
+
+      // Update mouse position for tooltip
+      setMousePosition({ x: e.clientX, y: e.clientY });
 
       let a = 0;
 
@@ -261,15 +281,88 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   }
 
   const mouseOut = (e) => {
-    setMouseLinePos(null);
-    setDescriptionArray([]);
+    if (!infoLocked) {
+      setMouseLinePos(null);
+      setDescriptionArray([]);
+    }
+  }
+
+  const handleClick = (e) => {
+    if (!infoLocked) {
+      // Lock info at current mouse position
+      setInfoLocked(true);
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    } else {
+      // Unlock info, resume normal mouseover
+      setInfoLocked(false);
+      setMouseLinePos(null);
+      setDescriptionArray([]);
+    }
   }
 
   let awayColor = awayTeamNames.abr ? rgbToRgba(teamColor[awayTeamNames.abr], 0.3) : '';
   let homeColor = homeTeamNames.abr ? rgbToRgba(teamColor[homeTeamNames.abr], 0.3) : '';
+
+  // Calculate if tooltip should be positioned to the left of mouse
+  const shouldPositionLeft = mousePosition.x > window.innerWidth / 2;
+  const tooltipOffset = shouldPositionLeft ? -300 : 10; // 300px is fixed width of tooltip
+
+  // Calculate if tooltip should be positioned below the mouse
+  const shouldPositionBelow = mousePosition.y < window.innerHeight / 2;
+  const tooltipVerticalOffset = shouldPositionBelow ? 10 : -10;
+  const tooltipVerticalTransform = shouldPositionBelow ? 'translateY(0)' : 'translateY(-100%)';
+
   return (
-    <div onMouseMove={mouseOver} onMouseOut={mouseOut} className='play' style={{ width: width + leftMargin }}>
-      {/* <div className="descriptionArea">{descriptionList}</div> */}
+    <div onMouseMove={mouseOver} onMouseOut={mouseOut} onClick={handleClick} className='play' style={{ width: width + leftMargin }}>
+      {descriptionArray.length > 0 && (
+        <div 
+          className="descriptionArea"
+          style={{
+            position: 'fixed',
+            left: mousePosition.x + tooltipOffset,
+            top: mousePosition.y + tooltipVerticalOffset,
+            transform: tooltipVerticalTransform,
+            zIndex: 1000
+          }}
+        >
+          {!shouldPositionBelow ? (
+            // When mouse is in bottom half, put actions first, then time/score at bottom
+            <>
+              <div className="actions-container">
+                {descriptionArray.map((a, index) => (
+                  <div key={index} className="action-item">
+                    <div className="action-description">{a.description}</div>
+                  </div>
+                ))}
+              </div>
+              {descriptionArray[0] && (
+                <div className="time-score-header bottom">
+                  <span className="time">{descriptionArray[0].clock}</span>
+                  <span className="score">{descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</span>
+                </div>
+              )}
+            </>
+          ) : (
+            // When mouse is in top half, put time/score first, then actions
+            <>
+              {descriptionArray[0] && (
+                <div className="time-score-header top">
+                  <span className="time">{descriptionArray[0].clock}</span>
+                  <span className="score">{descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</span>
+                </div>
+              )}
+              <div className="actions-container">
+                {descriptionArray.map((a, index) => (
+                  <div key={index} className="action-item">
+                    <div className="action-description">{a.description}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          {infoLocked && <div style={{fontSize: '0.9em', color: '#888', marginTop: 4}}>(Locked - click anywhere to unlock)</div>}
+        </div>
+      )}
       <svg height="600" width={width + leftMargin} className='line'>
         {timeline}
         <polyline points={pospoints.join(' ')} style={{"fill": awayColor}}/>

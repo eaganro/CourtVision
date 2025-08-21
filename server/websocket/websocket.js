@@ -1,7 +1,7 @@
 import { WebSocketServer } from 'ws';
 import fsp from 'fs/promises';
 
-import database from './database.js';
+import database from '../database/database.js';
 import myEmitter from '../eventEmitter.js';
 
 
