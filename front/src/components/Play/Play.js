@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { timeToSeconds } from '../../helpers/utils';
+import { timeToSeconds, formatClock, formatPeriod } from '../../helpers/utils';
 // import getWindowDimensions from '../hooks/windowDimensions';
 
 import Player from './Player/Player';
@@ -337,7 +337,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
               </div>
               {descriptionArray[0] && (
                 <div className="time-score-header bottom">
-                  <span className="time">{descriptionArray[0].clock}</span>
+                  <span className="time">{formatPeriod(descriptionArray[0].period)} {formatClock(descriptionArray[0].clock)}</span>
                   <span className="score">{descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</span>
                 </div>
               )}
@@ -347,7 +347,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
             <>
               {descriptionArray[0] && (
                 <div className="time-score-header top">
-                  <span className="time">{descriptionArray[0].clock}</span>
+                  <span className="time">{formatPeriod(descriptionArray[0].period)} {formatClock(descriptionArray[0].clock)}</span>
                   <span className="score">{descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</span>
                 </div>
               )}
