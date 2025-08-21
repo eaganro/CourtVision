@@ -1,4 +1,5 @@
 .play {
+  position: relative; // so locked tooltip (absolute) is anchored to this container
   // border: 1px solid black;
   margin: auto;
   margin-top: 20px;

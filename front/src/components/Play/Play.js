@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { timeToSeconds, formatClock, formatPeriod } from '../../helpers/utils';
 // import getWindowDimensions from '../hooks/windowDimensions';
 
@@ -15,6 +15,8 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const [highlightActionIds, setHighlightActionIds] = useState([]);
   const [infoLocked, setInfoLocked] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const playRef = useRef(null);
+  const tooltipRef = useRef(null);
 
   const leftMargin = 120;
 
@@ -304,6 +306,26 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     }
   }
 
+  // Close tooltip if clicking/tapping outside of play area when locked
+  useEffect(() => {
+    const handleOutside = (ev) => {
+      if (!infoLocked) return;
+      const container = playRef.current;
+      if (!container) return;
+      if (!container.contains(ev.target)) {
+        setInfoLocked(false);
+        setMouseLinePos(null);
+        setDescriptionArray([]);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside, { passive: true });
+    document.addEventListener('touchstart', handleOutside, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [infoLocked]);
+
   // Touch support: show tooltip while dragging finger over play area
   const onTouchStart = (e) => {
     if (e.touches && e.touches[0]) {
@@ -329,17 +351,38 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   let awayColor = awayTeamNames.abr ? rgbToRgba(teamColor[awayTeamNames.abr], 0.3) : '';
   let homeColor = homeTeamNames.abr ? rgbToRgba(teamColor[homeTeamNames.abr], 0.3) : '';
 
-  // Calculate if tooltip should be positioned to the left of mouse
-  const shouldPositionLeft = mousePosition.x > window.innerWidth / 2;
-  const tooltipOffset = shouldPositionLeft ? -300 : 10; // 300px is fixed width of tooltip
+  // Calculate preferred tooltip placement (left/right, above/below) and clamp within play area
+  const tooltipWidth = 300; // matches CSS width
+  const tooltipHeight = tooltipRef.current?.offsetHeight || 0;
+  const containerRect = playRef.current?.getBoundingClientRect();
 
-  // Calculate if tooltip should be positioned below the mouse
+  const shouldPositionLeft = mousePosition.x > window.innerWidth / 2;
   const shouldPositionBelow = mousePosition.y < window.innerHeight / 2;
-  const tooltipVerticalOffset = shouldPositionBelow ? 10 : -10;
-  const tooltipVerticalTransform = shouldPositionBelow ? 'translateY(0)' : 'translateY(-100%)';
+
+  let preferredLeft = shouldPositionLeft ? (mousePosition.x - tooltipWidth - 10) : (mousePosition.x + 10);
+  let preferredTop = shouldPositionBelow ? (mousePosition.y + 10) : (mousePosition.y - tooltipHeight - 10);
+
+  let clampedLeft = preferredLeft;
+  let clampedTop = preferredTop;
+  if (containerRect) {
+    const minLeft = containerRect.left;
+    const maxLeft = containerRect.right - tooltipWidth;
+    const minTop = containerRect.top;
+    const maxTop = containerRect.bottom - tooltipHeight;
+    clampedLeft = Math.max(minLeft, Math.min(preferredLeft, maxLeft));
+    clampedTop = Math.max(minTop, Math.min(preferredTop, maxTop));
+  }
+
+  // When locked, position relative to play container so it scrolls with it
+  const relativeLeft = containerRect ? clampedLeft - containerRect.left : clampedLeft;
+  const relativeTop = containerRect ? clampedTop - containerRect.top : clampedTop;
+  const tooltipStyle = infoLocked
+    ? { position: 'absolute', left: relativeLeft, top: relativeTop, zIndex: 1000 }
+    : { position: 'fixed', left: clampedLeft, top: clampedTop, zIndex: 1000 };
 
   return (
     <div
+      ref={playRef}
       onMouseMove={mouseOver}
       onMouseOut={mouseOut}
       onClick={handleClick}
@@ -353,13 +396,8 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       {descriptionArray.length > 0 && (
         <div 
           className="descriptionArea"
-          style={{
-            position: 'fixed',
-            left: mousePosition.x + tooltipOffset,
-            top: mousePosition.y + tooltipVerticalOffset,
-            transform: tooltipVerticalTransform,
-            zIndex: 1000
-          }}
+          style={tooltipStyle}
+          ref={tooltipRef}
         >
           {!shouldPositionBelow ? (
             // When mouse is in bottom half, put actions first, then time/score at bottom
