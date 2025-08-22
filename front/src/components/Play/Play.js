@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { timeToSeconds, formatClock, formatPeriod } from '../../helpers/utils';
 // import getWindowDimensions from '../hooks/windowDimensions';
 
 import Player from './Player/Player';
@@ -12,8 +13,14 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const [showMouse, setShowMouse] = useState(true);
   const [mouseLinePos, setMouseLinePos] = useState(null);
   const [highlightActionIds, setHighlightActionIds] = useState([]);
+  const [infoLocked, setInfoLocked] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const playRef = useRef(null);
+  const tooltipRef = useRef(null);
 
-  const leftMargin = 120;
+  // Keep only a small gap beyond the player name column (90px)
+  const leftMargin = 96; // 90 name + 6px padding
+  const rightMargin = 10; // small right-side padding for final actions
 
   const awayTeamName = awayTeamNames.name;
   const homeTeamName = homeTeamNames.name;
@@ -73,7 +80,8 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       }
     });
   });
-  const width = sectionWidth * 1 - leftMargin;
+  // Timeline draw width excludes margins
+  const width = sectionWidth * 1 - (leftMargin + rightMargin);
   
   let qWidth = width / 4;
   if (numQs > 4) {
@@ -84,7 +92,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const awayRows = Object.keys(awayPlayers).map(name => {
     return (
       <Player key={name} actions={awayPlayers[name]} timeline={awayPlayerTimeline[name]}
-        name={name} width={width} numQs={numQs} heightDivide={awayLength}
+        name={name} width={width} rightMargin={rightMargin} numQs={numQs} heightDivide={awayLength}
         highlight={highlightActionIds} leftMargin={leftMargin}></Player>
     );
   });
@@ -93,7 +101,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const homeRows = Object.keys(homePlayers).map(name => {
     return (
       <Player key={name} actions={homePlayers[name]} timeline={homePlayerTimeline[name]}
-        name={name} width={width} numQs={numQs} heightDivide={homeLength}
+        name={name} width={width} rightMargin={rightMargin} numQs={numQs} heightDivide={homeLength}
         highlight={highlightActionIds} leftMargin={leftMargin}></Player>
     );
   });
@@ -172,26 +180,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     }
   }
 
-
-  // let startx = 0;
-  // let starty = 0;
-  // const timeline = scoreTimeline.map((t, i) => {
-  //   let x1 = startx;
-  //   let x2 = (((t.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
-  //   if (t.period > 4) {
-  //     x2 = ((4 * 12 * 60 + 5 * (t.period - 4) * 60 - timeToSeconds(t.clock)) / (4 * 12 * 60)) * (qWidth * 4);
-  //   }
-  //   startx = x2;
-
-  //   let y1 = starty;
-  //   let y2 = t.scoreDiff * - 300 / maxY;
-  //   starty = y2;
-  //   return ([
-  //     <line period={t.period} key={'one' + i} x1={leftMargin + x1} y1={300 + y1} x2={leftMargin + x2} y2={300 + y1} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />,
-  //     <line period={t.period} key={'two' + i} x1={leftMargin + x2} y1={300 + y1} x2={leftMargin + x2} y2={300 + y2} style={{ stroke: 'rgb(255,0,0)', strokeWidth: 2 }} />
-  //   ])
-  // }).flat();
-
   const timeline = [];
   // timeline.push(<line key={'secondLast'} x1={leftMargin + startx} y1={300 + starty} x2={leftMargin + width} y2={300 + starty} style={{ stroke: 'rgb(255,0,0)', strokeWidth:2 }} />)
   timeline.unshift(<line key={'Last'} x1={0} y1={300} x2={leftMargin + width} y2={300} style={{ stroke: 'black', strokeWidth:1 }} />)
@@ -221,9 +209,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     lineJump = 20;
   }
 
-  let lineLabelStyle = {
-    // textAlign: 'right',
-  };
   for (let i = 0; i < numLines; i += 1) {
     let posy = 300 + ((i + 1) * lineJump) * - 300 / maxY
     timeline.unshift(<line key={`sp${i}-${awayTeamName}-${homeTeamName}`} x1={leftMargin - 5} y1={posy} x2={leftMargin + width} y2={posy} strokeDasharray={"5,5"} style={{ stroke: 'darkgrey', strokeWidth: 0.5 }} />)
@@ -235,73 +220,247 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   }
 
 
-  const descriptionList = descriptionArray.map(a => (<div>{a.description}</div>));
-  descriptionArray[0] && descriptionArray[0] && descriptionList.unshift(<div>{descriptionArray[0].clock} - {descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</div>)
+  const descriptionList = descriptionArray.map((a, index) => (
+    <div key={index} className="action-item">
+      <div className="action-description">{a.description}</div>
+    </div>
+  ));
+  
+  if (descriptionArray[0]) {
+    const time = descriptionArray[0].clock;
+    const scoreAway = descriptionArray[0].scoreAway;
+    const scoreHome = descriptionArray[0].scoreHome;
+    descriptionList.unshift(
+      <div key="time-score" className="time-score-header">
+        <span className="time">{time}</span>
+        <span className="score">{scoreAway} - {scoreHome}</span>
+      </div>
+    );
+  }
   let mouseLine = null;
-  const mouseOver = (e) => {
-    if (showMouse) {
-      let el = e.target;
-      while (el.className !== 'play') {
-        el = el.parentElement;
-      }
-      let pos = e.clientX - el.offsetLeft - leftMargin;
-
-      let a = 0;
-
-      let goneOver = false;
-      let sameTime = 1;
-      for (let i = 1; i < allActions.length && goneOver === false; i += 1) {
-        let actionPos = (((allActions[i].period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (qWidth * 4);
-        if (allActions[i].period > 4) {
-          actionPos = ((4 * 12 * 60 + 5 * (allActions[i].period - 4) * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (qWidth * 4);
-        }
-        if (actionPos > pos) {
-          goneOver = true;
-        } else {
-          if (allActions[a].clock === allActions[i].clock) {
-            sameTime += 1;
-          } else {
-            sameTime = 1;
-          }
-          a = i;
-        }
-      }
-      const hoverActions = [];
-      const hoverActionIds = [];
-      for (let i = 0; i < sameTime; i += 1) {
-        hoverActions.push(allActions[a - i]);
-        hoverActionIds.push(allActions[a - i].actionNumber);
-      }
-      setHighlightActionIds(hoverActionIds);
-      setDescriptionArray(hoverActions);
-      if (pos < 0 || pos > width) {
-        setMouseLinePos(null);
-      } else {
-        setMouseLinePos(pos + leftMargin);
-      }
-
-
-      // setShowMouse(false);
-      // setTimeout(() => setShowMouse(true), 200);
+  const updateHoverAt = (clientX, clientY, targetEl) => {
+    if (!(showMouse && !infoLocked)) return;
+    let el = targetEl;
+    while (el && el.className !== 'play') {
+      el = el.parentElement;
     }
+    if (!el) return;
+    const hoverPadding = 5;
+    const rawPos = clientX - el.offsetLeft - leftMargin;
+
+    // Update position for tooltip
+    setMousePosition({ x: clientX, y: clientY });
+
+    // Allow a small hover tolerance beyond both ends
+    if (rawPos < -hoverPadding || rawPos > width + hoverPadding) {
+      setMouseLinePos(null);
+      setDescriptionArray([]);
+      setHighlightActionIds([]);
+      return;
+    }
+
+    // Clamp within visible timeline for selection/indicator
+    let pos = Math.max(0, Math.min(rawPos, width));
+
+    let a = 0;
+
+    let goneOver = false;
+    let sameTime = 1;
+    for (let i = 1; i < allActions.length && goneOver === false; i += 1) {
+      let actionPos = (((allActions[i].period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (qWidth * 4);
+      if (allActions[i].period > 4) {
+        actionPos = ((4 * 12 * 60 + 5 * (allActions[i].period - 4) * 60 - timeToSeconds(allActions[i].clock)) / (4 * 12 * 60)) * (qWidth * 4);
+      }
+      if (actionPos > pos) {
+        goneOver = true;
+      } else {
+        if (allActions[a].clock === allActions[i].clock) {
+          sameTime += 1;
+        } else {
+          sameTime = 1;
+        }
+        a = i;
+      }
+    }
+    const hoverActions = [];
+    const hoverActionIds = [];
+    for (let i = 0; i < sameTime; i += 1) {
+      hoverActions.push(allActions[a - i]);
+      hoverActionIds.push(allActions[a - i].actionNumber);
+    }
+    setHighlightActionIds(hoverActionIds);
+    setDescriptionArray(hoverActions);
+    setMouseLinePos(pos + leftMargin);
+  };
+
+  const mouseOver = (e) => {
+    updateHoverAt(e.clientX, e.clientY, e.target);
   }
 
   const mouseOut = (e) => {
-    setMouseLinePos(null);
-    setDescriptionArray([]);
+    if (!infoLocked) {
+      setMouseLinePos(null);
+      setDescriptionArray([]);
+      setHighlightActionIds([]);
+    }
   }
+
+  const handleClick = (e) => {
+    if (!infoLocked) {
+      // Lock info at current mouse position
+      setInfoLocked(true);
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    } else {
+      // Unlock info, resume normal mouseover
+      setInfoLocked(false);
+      setMouseLinePos(null);
+      setDescriptionArray([]);
+      setHighlightActionIds([]);
+    }
+  }
+
+  // Close tooltip if clicking/tapping outside of play area when locked
+  useEffect(() => {
+    const handleOutside = (ev) => {
+      if (!infoLocked) return;
+      const container = playRef.current;
+      if (!container) return;
+      if (!container.contains(ev.target)) {
+        setInfoLocked(false);
+        setMouseLinePos(null);
+        setDescriptionArray([]);
+        setHighlightActionIds([]);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside, { passive: true });
+    document.addEventListener('touchstart', handleOutside, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [infoLocked]);
+
+  // Touch support: show tooltip while dragging finger over play area
+  const onTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      updateHoverAt(e.touches[0].clientX, e.touches[0].clientY, e.target);
+    }
+  };
+
+  const onTouchMove = (e) => {
+    if (e.touches && e.touches[0]) {
+      // Prevent page from scrolling while scrubbing timeline
+      e.preventDefault();
+      updateHoverAt(e.touches[0].clientX, e.touches[0].clientY, e.target);
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!infoLocked) {
+      setMouseLinePos(null);
+      setDescriptionArray([]);
+      setHighlightActionIds([]);
+    }
+  };
 
   let awayColor = awayTeamNames.abr ? rgbToRgba(teamColor[awayTeamNames.abr], 0.3) : '';
   let homeColor = homeTeamNames.abr ? rgbToRgba(teamColor[homeTeamNames.abr], 0.3) : '';
+
+  // Calculate preferred tooltip placement (left/right, above/below) and clamp within play area
+  const tooltipWidth = 300; // matches CSS width
+  const tooltipHeight = tooltipRef.current?.offsetHeight || 0;
+  const containerRect = playRef.current?.getBoundingClientRect();
+
+  const shouldPositionLeft = mousePosition.x > window.innerWidth / 2;
+  const shouldPositionBelow = mousePosition.y < window.innerHeight / 2;
+
+  let preferredLeft = shouldPositionLeft ? (mousePosition.x - tooltipWidth - 10) : (mousePosition.x + 10);
+  let preferredTop = shouldPositionBelow ? (mousePosition.y + 10) : (mousePosition.y - tooltipHeight - 10);
+
+  let clampedLeft = preferredLeft;
+  let clampedTop = preferredTop;
+  if (containerRect) {
+    // Allow tooltip to follow a few px into the left margin, and fully within container on the right
+    const hoverPadding = 5;
+    const minLeft = containerRect.left + leftMargin - hoverPadding;
+    const maxLeft = containerRect.right - tooltipWidth; // right margin already provides a few extra px
+    const minTop = containerRect.top;
+    const maxTop = containerRect.bottom - tooltipHeight;
+    clampedLeft = Math.max(minLeft, Math.min(preferredLeft, maxLeft));
+    clampedTop = Math.max(minTop, Math.min(preferredTop, maxTop));
+  }
+
+  // When locked, position relative to play container so it scrolls with it
+  const relativeLeft = containerRect ? clampedLeft - containerRect.left : clampedLeft;
+  const relativeTop = containerRect ? clampedTop - containerRect.top : clampedTop;
+  const tooltipStyle = infoLocked
+    ? { position: 'absolute', left: relativeLeft, top: relativeTop, zIndex: 1000 }
+    : { position: 'fixed', left: clampedLeft, top: clampedTop, zIndex: 1000 };
+
   return (
-    <div onMouseMove={mouseOver} onMouseOut={mouseOut} className='play' style={{ width: width + leftMargin }}>
-      {/* <div className="descriptionArea">{descriptionList}</div> */}
-      <svg height="600" width={width + leftMargin} className='line'>
+    <div
+      ref={playRef}
+      onMouseMove={mouseOver}
+      onMouseOut={mouseOut}
+      onMouseLeave={mouseOut}
+      onClick={handleClick}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchEnd}
+      className='play'
+      style={{ width: width + leftMargin + rightMargin }}
+    >
+      {descriptionArray.length > 0 && (
+        <div 
+          className="descriptionArea"
+          style={tooltipStyle}
+          ref={tooltipRef}
+        >
+          {!shouldPositionBelow ? (
+            // When mouse is in bottom half, put actions first, then time/score at bottom
+            <>
+              <div className="actions-container">
+                {descriptionArray.map((a, index) => (
+                  <div key={index} className="action-item">
+                    <div className="action-description">{a.description}</div>
+                  </div>
+                ))}
+              </div>
+              {descriptionArray[0] && (
+                <div className="time-score-header bottom">
+                  <span className="time">{formatPeriod(descriptionArray[0].period)} {formatClock(descriptionArray[0].clock)}</span>
+                  <span className="score">{descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</span>
+                </div>
+              )}
+            </>
+          ) : (
+            // When mouse is in top half, put time/score first, then actions
+            <>
+              {descriptionArray[0] && (
+                <div className="time-score-header top">
+                  <span className="time">{formatPeriod(descriptionArray[0].period)} {formatClock(descriptionArray[0].clock)}</span>
+                  <span className="score">{descriptionArray[0].scoreAway} - {descriptionArray[0].scoreHome}</span>
+                </div>
+              )}
+              <div className="actions-container">
+                {descriptionArray.map((a, index) => (
+                  <div key={index} className="action-item">
+                    <div className="action-description">{a.description}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          {infoLocked && <div style={{fontSize: '0.9em', color: '#888', marginTop: 4}}>(Locked - click anywhere to unlock)</div>}
+        </div>
+      )}
+      <svg height="600" width={width + leftMargin + rightMargin} className='line'>
         {timeline}
         <polyline points={pospoints.join(' ')} style={{"fill": awayColor}}/>
         <polyline points={negpoints.join(' ')} style={{"fill": homeColor}}/>
       </svg>
-      <svg height="600" width={width + leftMargin} className='line'>
+      <svg height="600" width={width + leftMargin + rightMargin} className='line'>
         {mouseLinePos !== null ? 
           <line x1={mouseLinePos} y1={10} x2={mouseLinePos} y2={590} style={{ stroke: 'grey', strokeWidth: 1 }} />
           : ''}
@@ -316,20 +475,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       </div>
     </div>
   );
-}
-
-function timeToSeconds(time) {
-  // Convert time string in the format "PT12M00.00S" to seconds
-  const match = time.match(/PT(\d+)M(\d+)\.(\d+)S/);
-  
-  if (match) {
-    const minutes = parseInt(match[1] || 0);
-    const seconds = parseInt(match[2] || 0);
-    const milliseconds = parseInt(match[3] || 0);
-    return minutes * 60 + seconds + milliseconds / 100;
-  }
-  
-  return 0;
 }
 
 function rgbToRgba(rgb, a) {

@@ -2,9 +2,9 @@ import pkg from 'pg';
 const { Pool } = pkg;
 
 import fs from 'fs/promises';
-import myEmitter from './eventEmitter.js';
+import myEmitter from '../eventEmitter.js';
 
-import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json' };
+// import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json' };
 import * as cheerio from 'cheerio';
 import { query } from 'express';
 

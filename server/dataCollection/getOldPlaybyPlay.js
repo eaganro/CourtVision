@@ -1,8 +1,24 @@
-import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json' };
+import gamesObj from '../public/data/schedule/schedule.json' assert { type: 'json' };
 import * as fs from 'fs';
 import fsp from 'fs/promises';
 import * as cheerio from 'cheerio';
-import database from './database.js';
+import database from '../database.js';
+
+
+import { gzip } from 'zlib';
+import { promisify } from 'util';
+const gzipAsync = promisify(gzip);
+
+import {
+  DynamoDBClient
+} from "@aws-sdk/client-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand
+} from "@aws-sdk/lib-dynamodb";
+
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 
 import { gzip } from 'zlib';

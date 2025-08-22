@@ -1,7 +1,7 @@
 import express from 'express';
 import http from 'http';
 import fsp from 'fs/promises';
-import database from './database.js';
+import database from './database/database.js';
 
 const app = express();
 const server = http.createServer(app);

@@ -2,10 +2,10 @@ import schedule from 'node-schedule';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import puppeteer from 'puppeteer';
-import myEmitter from './eventEmitter.js';
-import database from './database.js';
+import myEmitter from '../eventEmitter.js';
+import database from '../database.js';
 
-import gamesObj from './public/data/schedule/schedule.json' assert { type: 'json' };
+import gamesObj from '../public/data/schedule/schedule.json' assert { type: 'json' };
 // import testGame from './public/data/playByPlayData/0022300111.json' assert { type: 'json' };
 // schedule.scheduleJob('0 8 * * *', () => {
   const today = new Date();

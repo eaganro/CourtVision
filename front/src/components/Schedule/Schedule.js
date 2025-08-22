@@ -9,6 +9,14 @@ import './Schedule.scss';
 export default function Schedule({ games, date, changeDate, changeGame }) {
 
   const scrollRef = useRef(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startScrollLeft = useRef(0);
+  const dragMoved = useRef(false);
+  const handleGameClick = (id) => {
+    if (dragMoved.current) return; // suppress click if user dragged
+    changeGame(id);
+  }
 
   console.log(games);
   const gamesList = games.sort((a,b) => {
@@ -46,11 +54,11 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
   }).map(g => {
     if (!g.status.endsWith('ET')) {
       return (
-        <div className='game' key={g.id} onClick={() => changeGame(g.id)}>
+        <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>
           <div class="iconRow">
-            <img height="16" width="16" src={`img/teams/${g.awayteam}.png`}></img>
+            <img height="16" width="16" draggable={false} src={`img/teams/${g.awayteam}.png`}></img>
             {g.awayteam} - {g.hometeam}
-            <img height="16" width="16" src={`img/teams/${g.hometeam}.png`}></img>
+            <img height="16" width="16" draggable={false} src={`img/teams/${g.hometeam}.png`}></img>
           </div>
           <div>{g.awayscore} - {g.homescore}</div>
           <div>{g.status}</div>
@@ -58,11 +66,11 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
       )
     } else {
       return (
-        <div className='game' key={g.id} onClick={() => changeGame(g.id)}>
+        <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>
           <div class="iconRow">
-            <img height="16" width="16" src={`img/teams/${g.awayteam}.png`}></img>
+            <img height="16" width="16" draggable={false} src={`img/teams/${g.awayteam}.png`}></img>
             {g.awayteam} - {g.hometeam}
-            <img height="16" width="16" src={`img/teams/${g.hometeam}.png`}></img>
+            <img height="16" width="16" draggable={false} src={`img/teams/${g.hometeam}.png`}></img>
           </div>
           <div class="recordRow">
             {/* <span>{g.awayrecord}</span>
@@ -126,6 +134,57 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
 
   console.log(date);
 
+  const onMouseDown = (e) => {
+    if (!scrollRef.current) return;
+    isDragging.current = true;
+    dragMoved.current = false;
+    startX.current = e.pageX - scrollRef.current.offsetLeft;
+    startScrollLeft.current = scrollRef.current.scrollLeft;
+    scrollRef.current.classList.add('dragging');
+  };
+  const onMouseLeave = () => {
+    if (!scrollRef.current) return;
+    isDragging.current = false;
+    scrollRef.current.classList.remove('dragging');
+  };
+  const onMouseUp = () => {
+    if (!scrollRef.current) return;
+    isDragging.current = false;
+    scrollRef.current.classList.remove('dragging');
+  };
+  const onMouseMove = (e) => {
+    if (!isDragging.current || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = x - startX.current;
+    if (Math.abs(walk) > 3) dragMoved.current = true;
+    scrollRef.current.scrollLeft = startScrollLeft.current - walk;
+  };
+
+  const onTouchStart = (e) => {
+    if (!scrollRef.current) return;
+    isDragging.current = true;
+    dragMoved.current = false;
+    const touch = e.touches[0];
+    startX.current = touch.pageX - scrollRef.current.offsetLeft;
+    startScrollLeft.current = scrollRef.current.scrollLeft;
+    scrollRef.current.classList.add('dragging');
+  };
+  const onTouchEnd = () => {
+    if (!scrollRef.current) return;
+    isDragging.current = false;
+    scrollRef.current.classList.remove('dragging');
+  };
+  const onTouchMove = (e) => {
+    if (!isDragging.current || !scrollRef.current) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const x = touch.pageX - scrollRef.current.offsetLeft;
+    const walk = x - startX.current;
+    if (Math.abs(walk) > 3) dragMoved.current = true;
+    scrollRef.current.scrollLeft = startScrollLeft.current - walk;
+  };
+
   return (
     <div className='schedule'>
       <div className='scheduleContent'>
@@ -137,7 +196,17 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
         <div className='gamePick'>
           <IconButton className='scheduleButton' onClick={scrollScheduleLeft}><NavigateBefore /></IconButton>
           {gamesList.length ?
-            <div className="games" ref={scrollRef}>
+            <div
+              className="games"
+              ref={scrollRef}
+              onMouseDown={onMouseDown}
+              onMouseLeave={onMouseLeave}
+              onMouseUp={onMouseUp}
+              onMouseMove={onMouseMove}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+              onTouchMove={onTouchMove}
+            >
               {gamesList}
             </div> :
             <div className='noGames'>No Games Scheduled</div>

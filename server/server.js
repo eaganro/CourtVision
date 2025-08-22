@@ -1,3 +1,3 @@
-import './index.js';
+import './raspberrypi.js';
 // import './getData.js';
-import './websocket.js';
+import './websocket/websocket.js';
