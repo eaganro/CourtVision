@@ -1,7 +1,7 @@
 import { timeToSeconds } from '../../../helpers/utils';
 
 import './Player.scss';
-export default function Player({ actions, timeline, name, width, numQs, heightDivide, highlight, leftMargin }) {
+export default function Player({ actions, timeline, name, width, rightMargin = 0, numQs, heightDivide, highlight, leftMargin }) {
 
   const playerName = name;
 
@@ -90,7 +90,7 @@ export default function Player({ actions, timeline, name, width, numQs, heightDi
   return (
     <div className='player' style={{ height: `${275/heightDivide}px`}}>
       <div className='playerName' style={{ width: 90 }}>{playerName}</div>
-      <svg width={width} height="20" className='line' style={{left: leftMargin}}>
+      <svg width={width + rightMargin} height="20" className='line' style={{left: leftMargin}}>
         {playTimeLines}
         {dots}
       </svg>

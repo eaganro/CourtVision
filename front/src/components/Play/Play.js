@@ -18,7 +18,9 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const playRef = useRef(null);
   const tooltipRef = useRef(null);
 
-  const leftMargin = 120;
+  // Keep only a small gap beyond the player name column (90px)
+  const leftMargin = 96; // 90 name + 6px padding
+  const rightMargin = 10; // small right-side padding for final actions
 
   const awayTeamName = awayTeamNames.name;
   const homeTeamName = homeTeamNames.name;
@@ -78,7 +80,8 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       }
     });
   });
-  const width = sectionWidth * 1 - leftMargin;
+  // Timeline draw width excludes margins
+  const width = sectionWidth * 1 - (leftMargin + rightMargin);
   
   let qWidth = width / 4;
   if (numQs > 4) {
@@ -89,7 +92,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const awayRows = Object.keys(awayPlayers).map(name => {
     return (
       <Player key={name} actions={awayPlayers[name]} timeline={awayPlayerTimeline[name]}
-        name={name} width={width} numQs={numQs} heightDivide={awayLength}
+        name={name} width={width} rightMargin={rightMargin} numQs={numQs} heightDivide={awayLength}
         highlight={highlightActionIds} leftMargin={leftMargin}></Player>
     );
   });
@@ -98,7 +101,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const homeRows = Object.keys(homePlayers).map(name => {
     return (
       <Player key={name} actions={homePlayers[name]} timeline={homePlayerTimeline[name]}
-        name={name} width={width} numQs={numQs} heightDivide={homeLength}
+        name={name} width={width} rightMargin={rightMargin} numQs={numQs} heightDivide={homeLength}
         highlight={highlightActionIds} leftMargin={leftMargin}></Player>
     );
   });
@@ -242,10 +245,22 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       el = el.parentElement;
     }
     if (!el) return;
-    let pos = clientX - el.offsetLeft - leftMargin;
+    const hoverPadding = 5;
+    const rawPos = clientX - el.offsetLeft - leftMargin;
 
     // Update position for tooltip
     setMousePosition({ x: clientX, y: clientY });
+
+    // Allow a small hover tolerance beyond both ends
+    if (rawPos < -hoverPadding || rawPos > width + hoverPadding) {
+      setMouseLinePos(null);
+      setDescriptionArray([]);
+      setHighlightActionIds([]);
+      return;
+    }
+
+    // Clamp within visible timeline for selection/indicator
+    let pos = Math.max(0, Math.min(rawPos, width));
 
     let a = 0;
 
@@ -275,11 +290,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     }
     setHighlightActionIds(hoverActionIds);
     setDescriptionArray(hoverActions);
-    if (pos < 0 || pos > width) {
-      setMouseLinePos(null);
-    } else {
-      setMouseLinePos(pos + leftMargin);
-    }
+    setMouseLinePos(pos + leftMargin);
   };
 
   const mouseOver = (e) => {
@@ -290,6 +301,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     if (!infoLocked) {
       setMouseLinePos(null);
       setDescriptionArray([]);
+      setHighlightActionIds([]);
     }
   }
 
@@ -303,6 +315,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       setInfoLocked(false);
       setMouseLinePos(null);
       setDescriptionArray([]);
+      setHighlightActionIds([]);
     }
   }
 
@@ -316,6 +329,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
         setInfoLocked(false);
         setMouseLinePos(null);
         setDescriptionArray([]);
+        setHighlightActionIds([]);
       }
     };
     document.addEventListener('mousedown', handleOutside, { passive: true });
@@ -345,6 +359,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     if (!infoLocked) {
       setMouseLinePos(null);
       setDescriptionArray([]);
+      setHighlightActionIds([]);
     }
   };
 
@@ -365,8 +380,10 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   let clampedLeft = preferredLeft;
   let clampedTop = preferredTop;
   if (containerRect) {
-    const minLeft = containerRect.left;
-    const maxLeft = containerRect.right - tooltipWidth;
+    // Allow tooltip to follow a few px into the left margin, and fully within container on the right
+    const hoverPadding = 5;
+    const minLeft = containerRect.left + leftMargin - hoverPadding;
+    const maxLeft = containerRect.right - tooltipWidth; // right margin already provides a few extra px
     const minTop = containerRect.top;
     const maxTop = containerRect.bottom - tooltipHeight;
     clampedLeft = Math.max(minLeft, Math.min(preferredLeft, maxLeft));
@@ -385,13 +402,14 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       ref={playRef}
       onMouseMove={mouseOver}
       onMouseOut={mouseOut}
+      onMouseLeave={mouseOut}
       onClick={handleClick}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       onTouchCancel={onTouchEnd}
       className='play'
-      style={{ width: width + leftMargin }}
+      style={{ width: width + leftMargin + rightMargin }}
     >
       {descriptionArray.length > 0 && (
         <div 
@@ -437,12 +455,12 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
           {infoLocked && <div style={{fontSize: '0.9em', color: '#888', marginTop: 4}}>(Locked - click anywhere to unlock)</div>}
         </div>
       )}
-      <svg height="600" width={width + leftMargin} className='line'>
+      <svg height="600" width={width + leftMargin + rightMargin} className='line'>
         {timeline}
         <polyline points={pospoints.join(' ')} style={{"fill": awayColor}}/>
         <polyline points={negpoints.join(' ')} style={{"fill": homeColor}}/>
       </svg>
-      <svg height="600" width={width + leftMargin} className='line'>
+      <svg height="600" width={width + leftMargin + rightMargin} className='line'>
         {mouseLinePos !== null ? 
           <line x1={mouseLinePos} y1={10} x2={mouseLinePos} y2={590} style={{ stroke: 'grey', strokeWidth: 1 }} />
           : ''}
