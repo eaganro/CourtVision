@@ -6,17 +6,24 @@ import Player from './Player/Player';
 
 import './Play.scss';
 
-export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePlayers, allActions, scoreTimeline, awayPlayerTimeline, homePlayerTimeline, numQs, sectionWidth, lastAction }) {
+export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePlayers, allActions, scoreTimeline, awayPlayerTimeline, homePlayerTimeline, numQs, sectionWidth, lastAction, onSelectRange, selectedRangeSecs }) {
 
   const [descriptionArray, setDescriptionArray] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showMouse, setShowMouse] = useState(true);
   const [mouseLinePos, setMouseLinePos] = useState(null);
   const [highlightActionIds, setHighlightActionIds] = useState([]);
+  // Tooltip only follows hover now; no click-to-lock
   const [infoLocked, setInfoLocked] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const playRef = useRef(null);
   const tooltipRef = useRef(null);
+
+  // Drag select state
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(null);
+  const [dragCurrentX, setDragCurrentX] = useState(null);
+  const dragJustEndedRef = useRef(false);
 
   // Keep only a small gap beyond the player name column (90px)
   const leftMargin = 96; // 90 name + 6px padding
@@ -290,72 +297,113 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     }
     setHighlightActionIds(hoverActionIds);
     setDescriptionArray(hoverActions);
-    setMouseLinePos(pos + leftMargin);
+    if (!isDragging) {
+      setMouseLinePos(pos + leftMargin);
+    }
   };
 
   const mouseOver = (e) => {
     updateHoverAt(e.clientX, e.clientY, e.target);
+    if (isDragging) {
+      handleDragMove(e);
+    }
   }
 
   const mouseOut = (e) => {
-    if (!infoLocked) {
+    if (!infoLocked && !isDragging) {
       setMouseLinePos(null);
       setDescriptionArray([]);
       setHighlightActionIds([]);
     }
   }
 
+  // Normal click (without a drag) clears any selection
   const handleClick = (e) => {
-    if (!infoLocked) {
-      // Lock info at current mouse position
-      setInfoLocked(true);
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    } else {
-      // Unlock info, resume normal mouseover
-      setInfoLocked(false);
-      setMouseLinePos(null);
-      setDescriptionArray([]);
-      setHighlightActionIds([]);
+    // If a drag just ended, suppress this click (browser fires click after mouseup)
+    if (dragJustEndedRef.current) {
+      dragJustEndedRef.current = false;
+      e.preventDefault?.();
+      e.stopPropagation?.();
+      return;
     }
+    onSelectRange && onSelectRange(null);
   }
 
-  // Close tooltip if clicking/tapping outside of play area when locked
+  // Helpers to convert between x-position and elapsed game seconds
+  const posToElapsedSeconds = (pos) => {
+    const totalRegSeconds = 4 * 12 * 60; // we map visible width to regulation
+    const ratio = Math.max(0, Math.min(1, pos / (width))); // clamp
+    return ratio * totalRegSeconds;
+  };
+
+  // Mouse drag handlers
+  const getClampedX = (clientX) => {
+    const el = playRef.current;
+    if (!el) return null;
+    const raw = clientX - el.offsetLeft - leftMargin;
+    return Math.max(0, Math.min(width, raw));
+  };
+
+  const handleDragStart = (e) => {
+    const x = getClampedX(e.clientX ?? e.touches?.[0]?.clientX);
+    if (x == null) return;
+    setIsDragging(true);
+    setDragStartX(x);
+    setDragCurrentX(x);
+  };
+
+  const handleDragMove = (e) => {
+    const x = getClampedX(e.clientX ?? e.touches?.[0]?.clientX);
+    if (x == null) return;
+    setDragCurrentX(x);
+  };
+
+  const handleDragEnd = (e) => {
+    if (!isDragging) return;
+    const endX = getClampedX(e.clientX ?? e.changedTouches?.[0]?.clientX ?? dragCurrentX);
+    setIsDragging(false);
+    // If it was a click (tiny move), treat as reset selection
+    if (dragStartX == null || endX == null || Math.abs(endX - dragStartX) < 3) {
+      setDragStartX(null);
+      setDragCurrentX(null);
+      onSelectRange && onSelectRange(null);
+      return;
+    }
+    const start = Math.min(dragStartX, endX);
+    const finish = Math.max(dragStartX, endX);
+    const startSecs = posToElapsedSeconds(start);
+    const endSecs = posToElapsedSeconds(finish);
+    setDragStartX(null);
+    setDragCurrentX(null);
+    // Mark that we performed a drag selection to suppress the trailing click event
+    dragJustEndedRef.current = true;
+    onSelectRange && onSelectRange({ start: startSecs, end: endSecs });
+  };
+
+  // Remove old lock behavior entirely
   useEffect(() => {
-    const handleOutside = (ev) => {
-      if (!infoLocked) return;
-      const container = playRef.current;
-      if (!container) return;
-      if (!container.contains(ev.target)) {
-        setInfoLocked(false);
-        setMouseLinePos(null);
-        setDescriptionArray([]);
-        setHighlightActionIds([]);
-      }
-    };
-    document.addEventListener('mousedown', handleOutside, { passive: true });
-    document.addEventListener('touchstart', handleOutside, { passive: true });
-    return () => {
-      document.removeEventListener('mousedown', handleOutside);
-      document.removeEventListener('touchstart', handleOutside);
-    };
-  }, [infoLocked]);
+    setInfoLocked(false);
+  }, []);
 
   // Touch support: show tooltip while dragging finger over play area
   const onTouchStart = (e) => {
     if (e.touches && e.touches[0]) {
+      handleDragStart(e);
       updateHoverAt(e.touches[0].clientX, e.touches[0].clientY, e.target);
     }
   };
 
   const onTouchMove = (e) => {
     if (e.touches && e.touches[0]) {
-      // Prevent page from scrolling while scrubbing timeline
+      // Prevent page scroll while dragging/hovering
       e.preventDefault();
+      handleDragMove(e);
       updateHoverAt(e.touches[0].clientX, e.touches[0].clientY, e.target);
     }
   };
 
-  const onTouchEnd = () => {
+  const onTouchEnd = (e) => {
+    handleDragEnd(e);
     if (!infoLocked) {
       setMouseLinePos(null);
       setDescriptionArray([]);
@@ -403,6 +451,8 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       onMouseMove={mouseOver}
       onMouseOut={mouseOut}
       onMouseLeave={mouseOut}
+      onMouseDown={handleDragStart}
+      onMouseUp={handleDragEnd}
       onClick={handleClick}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -452,7 +502,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
               </div>
             </>
           )}
-          {infoLocked && <div style={{fontSize: '0.9em', color: '#888', marginTop: 4}}>(Locked - click anywhere to unlock)</div>}
+          {/* No lock state message anymore */}
         </div>
       )}
       <svg height="600" width={width + leftMargin + rightMargin} className='line'>
@@ -461,9 +511,32 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
         <polyline points={negpoints.join(' ')} style={{"fill": homeColor}}/>
       </svg>
       <svg height="600" width={width + leftMargin + rightMargin} className='line'>
-        {mouseLinePos !== null ? 
+        {mouseLinePos !== null ? (
           <line x1={mouseLinePos} y1={10} x2={mouseLinePos} y2={590} style={{ stroke: 'grey', strokeWidth: 1 }} />
-          : ''}
+        ) : null}
+        {(isDragging && dragStartX !== null && dragCurrentX !== null) ? (
+          <rect
+            x={leftMargin + Math.min(dragStartX, dragCurrentX)}
+            y={10}
+            width={Math.abs(dragCurrentX - dragStartX)}
+            height={580}
+            fill="rgba(30,144,255,0.2)"
+            stroke="dodgerblue"
+            strokeWidth="1"
+          />
+        ) : null}
+        {(!isDragging && selectedRangeSecs && selectedRangeSecs.start != null && selectedRangeSecs.end != null) ? (
+          (() => {
+            const totalRegSeconds = 4 * 12 * 60;
+            const startRatio = Math.max(0, Math.min(1, selectedRangeSecs.start / totalRegSeconds));
+            const endRatio = Math.max(0, Math.min(1, selectedRangeSecs.end / totalRegSeconds));
+            const x = leftMargin + width * Math.min(startRatio, endRatio);
+            const w = width * Math.abs(endRatio - startRatio);
+            return (
+              <rect x={x} y={10} width={w} height={580} fill="rgba(30,144,255,0.15)" stroke="dodgerblue" strokeWidth="1" />
+            );
+          })()
+        ) : null}
       </svg>
       <div class="teamName" style={{color: teamColor[awayTeamNames?.abr]?.replaceAll(' ', ', ')}}>{awayTeamName}</div>
       <div className='teamSection'>

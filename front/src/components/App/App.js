@@ -59,6 +59,7 @@ export default function App() {
   const [statOn, setStatOn] = useState([true, true, true, true, true, true, true, true]);
   const [numQs, setNumQs] = useState(4);
   const [lastAction, setLastAction] = useState(null);
+  const [selectionRangeSecs, setSelectionRangeSecs] = useState(null);
 
   const [ws, setWs] = useState(null);
 
@@ -341,10 +342,21 @@ export default function App() {
           homePlayerTimeline={homePlayerTimeline}
           numQs={numQs}
           sectionWidth={playByPlaySectionWidth}
-          lastAction={lastAction}></Play>
+          lastAction={lastAction}
+          onSelectRange={(range) => setSelectionRangeSecs(range)}
+          selectedRangeSecs={selectionRangeSecs}
+        ></Play>
         <StatButtons statOn={statOn} changeStatOn={changeStatOn}></StatButtons>
       </div>
-      <Boxscore box={box}></Boxscore>
+      <Boxscore
+        box={box}
+        playByPlay={playByPlay}
+        selectionRangeSecs={selectionRangeSecs}
+        awayTeamId={awayTeamId}
+        homeTeamId={homeTeamId}
+        awayPlayerTimeline={awayPlayerTimeline}
+        homePlayerTimeline={homePlayerTimeline}
+      ></Boxscore>
     </div>
   );
 }
