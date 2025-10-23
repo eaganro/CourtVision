@@ -246,7 +246,7 @@ function startPollingGame(gameId) {
 
 // --- Schedule recovery at 4 AM ET ---
 // const recoverRule = new schedule.RecurrenceRule();
-// recoverRule.tz = 'America/New_York'; recoverRule.hour = 9; recoverRule.minute = 54;
+// recoverRule.tz = 'America/New_York'; recoverRule.hour = 14; recoverRule.minute = 55;
 // schedule.scheduleJob(recoverRule, async () => {
 //   await loadManifest();
 //   await recoverStuckGames();
@@ -262,7 +262,7 @@ const targetET = new Date(`${year}-${month}-${day}T13:20:00-04:00`);
 if (nowET > targetET) {
   schedulePolling();
 }
-schedule.scheduleJob({ tz: 'America/New_York', hour: 13, minute: 20 }, schedulePolling);
+schedule.scheduleJob({ tz: 'America/New_York', hour: 18, minute: 10 }, schedulePolling);
 
 async function schedulePolling() {
   await loadManifest();

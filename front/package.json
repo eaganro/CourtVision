@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack --watch --mode development",
-    "build": "webpack --mode production",
+    "build": "webpack --mode production --progress",
     "build:prod:upload": "webpack --mode production && aws s3 cp ../server/public/js/main.js s3://roryeagan.com-nba/js/main.js"
   },
   "author": "",
