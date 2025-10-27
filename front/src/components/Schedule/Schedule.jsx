@@ -1,12 +1,13 @@
 import { useRef } from 'react';
 import { NavigateNext, NavigateBefore } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
+import CircularProgress from '@mui/material/CircularProgress';
 import { dateAdd, dateMinus } from '../../environment';
 
 
 import './Schedule.scss';
 
-export default function Schedule({ games, date, changeDate, changeGame }) {
+export default function Schedule({ games, date, changeDate, changeGame, isLoading }) {
 
   const scrollRef = useRef(null);
   const isDragging = useRef(false);
@@ -18,8 +19,7 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
     changeGame(id);
   }
 
-  console.log(games);
-  const gamesList = games.sort((a,b) => {
+  const sortedGames = [...games].sort((a,b) => {
     let datetimeA = new Date(a.starttime);
     let datetimeB = new Date(b.starttime);
     if (a.status.startsWith('Final') && b.status.startsWith('Final')) {
@@ -51,11 +51,12 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
         }
       }
     }
-  }).map(g => {
+  });
+  const gamesList = sortedGames.map(g => {
     if (!g.status.endsWith('ET')) {
       return (
         <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>
-          <div class="iconRow">
+          <div className='iconRow'>
             <img height="16" width="16" draggable={false} src={`img/teams/${g.awayteam}.png`}></img>
             {g.awayteam} - {g.hometeam}
             <img height="16" width="16" draggable={false} src={`img/teams/${g.hometeam}.png`}></img>
@@ -67,12 +68,12 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
     } else {
       return (
         <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>
-          <div class="iconRow">
+          <div className='iconRow'>
             <img height="16" width="16" draggable={false} src={`img/teams/${g.awayteam}.png`}></img>
             {g.awayteam} - {g.hometeam}
             <img height="16" width="16" draggable={false} src={`img/teams/${g.hometeam}.png`}></img>
           </div>
-          <div class="recordRow">
+          <div className='recordRow'>
             {/* <span>{g.awayrecord}</span>
             <span>{g.homerecord}</span> */}
           </div>
@@ -127,12 +128,6 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
       scrollRef.current.scrollLeft = 0;
     }
   }
-
-  const here = (x,y,z) => {
-    console.log(x,y,z);
-  }
-
-  console.log(date);
 
   const onMouseDown = (e) => {
     if (!scrollRef.current) return;
@@ -195,9 +190,14 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
         </div>
         <div className='gamePick'>
           <IconButton className='scheduleButton' onClick={scrollScheduleLeft}><NavigateBefore /></IconButton>
-          {gamesList.length ?
+          {isLoading ? (
+            <div className='loadingIndicator'>
+              <CircularProgress size={24} thickness={5} />
+              <span>Loading games...</span>
+            </div>
+          ) : gamesList.length ? (
             <div
-              className="games"
+              className='games'
               ref={scrollRef}
               onMouseDown={onMouseDown}
               onMouseLeave={onMouseLeave}
@@ -208,9 +208,10 @@ export default function Schedule({ games, date, changeDate, changeGame }) {
               onTouchMove={onTouchMove}
             >
               {gamesList}
-            </div> :
+            </div>
+          ) : (
             <div className='noGames'>No Games Scheduled</div>
-          }
+          )}
           <IconButton className='scheduleButton end' onClick={scrollScheduleRight}><NavigateNext /></IconButton>
         </div>
       </div>

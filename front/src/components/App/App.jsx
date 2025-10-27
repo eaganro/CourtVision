@@ -34,6 +34,7 @@ export default function App() {
 
   const [date, setDate] = useState(initialDate);
   const [games, setGames] = useState([]);
+  const [isScheduleLoading, setIsScheduleLoading] = useState(true);
   const [box, setBox] = useState({});
   const [playByPlay, setPlayByPlay] = useState([]);
   // const [gameId, setGameId] = useState("0022300216");
@@ -94,6 +95,7 @@ export default function App() {
           getBox(url);
         } else if (msg.type === "date") {
           setGames(msg.data);
+          setIsScheduleLoading(false);
         }
       } catch (err) {
         console.error("Error handling WS message", msg, err);
@@ -233,6 +235,10 @@ export default function App() {
 
   const changeDate = (e) => {
     const newDate = e.target.value;
+    if (newDate === date) {
+      return;
+    }
+    setIsScheduleLoading(true);
     setDate(newDate);
     updateQueryParams(newDate, gameId);
   }
@@ -322,7 +328,13 @@ export default function App() {
 
   return (
     <div className='topLevel'>
-      <Schedule games={games} date={date} changeDate={changeDate} changeGame={changeGame}></Schedule>
+      <Schedule
+        games={games}
+        date={date}
+        changeDate={changeDate}
+        changeGame={changeGame}
+        isLoading={isScheduleLoading}
+      ></Schedule>
       <Score
         homeTeam={box?.homeTeam?.teamTricode}
         awayTeam={box?.awayTeam?.teamTricode}
