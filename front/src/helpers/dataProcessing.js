@@ -206,6 +206,9 @@ export function updatePlaytimesWithAction(a, playtimes) {
     playtimes[playerName].on = false;
   } else if (a.actionType === 'substitution') {
     let name = a.description.slice(a.description.indexOf(':') + 2);
+    if (name === "Yang") {
+	    name = "Hansen";
+    }
     let t = playtimes[name].times;
     if (a.description.includes('out:')) {
       if (playtimes[name].on === false) {

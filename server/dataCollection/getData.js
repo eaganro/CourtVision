@@ -230,13 +230,13 @@ schedule.scheduleJob(recoverRule, async () => {
 
 const dailyRule = new schedule.RecurrenceRule();
 dailyRule.tz = 'America/New_York';
-dailyRule.hour = 13;
-dailyRule.minute = 20;
+dailyRule.hour = 14;
+dailyRule.minute = 50;
 schedule.scheduleJob(dailyRule, async () => {
   await loadManifest();  
   const todayString = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
   console.log(todayString);
-  console.log(today);
+  // console.log(today);
 
   const browser = await getBrowser();
 

@@ -41,7 +41,17 @@
         font-weight: 500;
         margin: auto;
       }
-  
+
+      .loadingIndicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c6d6f;
+        font-weight: 500;
+        gap: 10px;
+        margin: auto;
+      }
+
       .games {
         display: flex;
         margin-left: 10px;

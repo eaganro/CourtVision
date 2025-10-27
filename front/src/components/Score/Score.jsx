@@ -1,11 +1,26 @@
+import CircularProgress from '@mui/material/CircularProgress';
 import './Score.scss';
 import { PREFIX } from '../../environment';
 
-export default function Score({ homeTeam, awayTeam, score, date, changeDate}) {
+export default function Score({ homeTeam, awayTeam, score, date, changeDate, isLoading }) {
 
-  const gameDate = new Date(date)
+  if (isLoading) {
+    return (
+      <div className='scoreElement'>
+        <div className='loadingIndicator'>
+          <CircularProgress size={24} thickness={5} />
+          <span>Loading game...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const gameDate = date ? new Date(date) : null;
 
   const changeToGameDate = () => {
+    if (!gameDate) {
+      return;
+    }
     let month = gameDate.getMonth() + 1;
     if (month < 10) {
       month = '0' + month;
@@ -20,7 +35,13 @@ export default function Score({ homeTeam, awayTeam, score, date, changeDate}) {
 
   return (
     <div className='scoreElement'>
-      <div onClick={changeToGameDate} className='gameDate'>{gameDate.toDateString().slice(4)}</div>
+      <div
+        onClick={gameDate ? changeToGameDate : undefined}
+        className='gameDate'
+        style={{ cursor: gameDate ? 'pointer' : 'default' }}
+      >
+        {gameDate ? gameDate.toDateString().slice(4) : '---'}
+      </div>
       <div className='scoreArea'>
         <div>{score ? score.away : '--'}</div>
         {awayTeam && (

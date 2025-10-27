@@ -5,24 +5,36 @@
   "main": "index.js",
   "scripts": {
     "dev": "vite",
+<<<<<<< HEAD
     "dev:watch": "vite build --watch --mode development",
     "serve": "vite",
     "build": "vite build",
     "build:local": "vite build --outDir dist",
     "build:prod:upload": "vite build && aws s3 cp ../server/public/js/main.js s3://roryeagan.com-nba/js/main.js"
+=======
+    "devpi": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:prod:upload": "npm run build && aws s3 cp ../server/public/js/main.js s3://roryeagan.com-nba/js/main.js && aws s3 cp ../server/public/js/style.css s3://roryeagan.com-nba/js/style.css"
+>>>>>>> serverless
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+<<<<<<< HEAD
     "@vitejs/plugin-react": "^4.2.0",
     "sass": "^1.71.1",
     "vite": "^5.4.0",
     "vite-plugin-css-injected-by-js": "^3.5.2"
+=======
+    "@vitejs/plugin-react": "^4.2.1",
+    "sass": "^1.71.1",
+    "vite": "^5.0.0"
+>>>>>>> serverless
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.14.6",
     "@mui/material": "^5.14.9",
     "react": "^18.2.0",

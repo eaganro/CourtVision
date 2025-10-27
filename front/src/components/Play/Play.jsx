@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 import { timeToSeconds, formatClock, formatPeriod } from '../../helpers/utils';
 // import getWindowDimensions from '../hooks/windowDimensions';
 
@@ -6,7 +7,7 @@ import Player from './Player/Player';
 
 import './Play.scss';
 
-export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePlayers, allActions, scoreTimeline, awayPlayerTimeline, homePlayerTimeline, numQs, sectionWidth, lastAction, onSelectRange, selectedRangeSecs }) {
+export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePlayers, allActions, scoreTimeline, awayPlayerTimeline, homePlayerTimeline, numQs, sectionWidth, lastAction, isLoading }) {
 
   const [descriptionArray, setDescriptionArray] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -65,10 +66,42 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     WAS: 'rgb(0 43 92)',
   };
 
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  window.addEventListener("resize", () => {
-    setWindowWidth(window.innerWidth);
-  });
+  useEffect(() => {
+    const handleOutside = (ev) => {
+      if (!infoLocked) return;
+      const container = playRef.current;
+      if (!container) return;
+      if (!container.contains(ev.target)) {
+        setInfoLocked(false);
+        setMouseLinePos(null);
+        setDescriptionArray([]);
+        setHighlightActionIds([]);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside, { passive: true });
+    document.addEventListener('touchstart', handleOutside, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [infoLocked]);
+
+  if (isLoading) {
+    return (
+      <div className='play'>
+        <div className='loadingIndicator'>
+          <CircularProgress size={24} thickness={5} />
+          <span>Loading play-by-play...</span>
+        </div>
+      </div>
+    );
+  }
   const playtimes = {};
   Object.keys(awayPlayers).forEach(player => {
     playtimes[player] = {
@@ -328,62 +361,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     }
     onSelectRange && onSelectRange(null);
   }
-
-  // Helpers to convert between x-position and elapsed game seconds
-  const posToElapsedSeconds = (pos) => {
-    const totalRegSeconds = 4 * 12 * 60; // we map visible width to regulation
-    const ratio = Math.max(0, Math.min(1, pos / (width))); // clamp
-    return ratio * totalRegSeconds;
-  };
-
-  // Mouse drag handlers
-  const getClampedX = (clientX) => {
-    const el = playRef.current;
-    if (!el) return null;
-    const raw = clientX - el.offsetLeft - leftMargin;
-    return Math.max(0, Math.min(width, raw));
-  };
-
-  const handleDragStart = (e) => {
-    const x = getClampedX(e.clientX ?? e.touches?.[0]?.clientX);
-    if (x == null) return;
-    setIsDragging(true);
-    setDragStartX(x);
-    setDragCurrentX(x);
-  };
-
-  const handleDragMove = (e) => {
-    const x = getClampedX(e.clientX ?? e.touches?.[0]?.clientX);
-    if (x == null) return;
-    setDragCurrentX(x);
-  };
-
-  const handleDragEnd = (e) => {
-    if (!isDragging) return;
-    const endX = getClampedX(e.clientX ?? e.changedTouches?.[0]?.clientX ?? dragCurrentX);
-    setIsDragging(false);
-    // If it was a click (tiny move), treat as reset selection
-    if (dragStartX == null || endX == null || Math.abs(endX - dragStartX) < 3) {
-      setDragStartX(null);
-      setDragCurrentX(null);
-      onSelectRange && onSelectRange(null);
-      return;
-    }
-    const start = Math.min(dragStartX, endX);
-    const finish = Math.max(dragStartX, endX);
-    const startSecs = posToElapsedSeconds(start);
-    const endSecs = posToElapsedSeconds(finish);
-    setDragStartX(null);
-    setDragCurrentX(null);
-    // Mark that we performed a drag selection to suppress the trailing click event
-    dragJustEndedRef.current = true;
-    onSelectRange && onSelectRange({ start: startSecs, end: endSecs });
-  };
-
-  // Remove old lock behavior entirely
-  useEffect(() => {
-    setInfoLocked(false);
-  }, []);
 
   // Touch support: show tooltip while dragging finger over play area
   const onTouchStart = (e) => {

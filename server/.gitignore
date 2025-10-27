@@ -38,6 +38,6 @@ packages/react-devtools-shell/dist
 packages/react-devtools-timeline/dist
 
 public/data
-public/js/main.js
+public/
 
 databaseCreds.js

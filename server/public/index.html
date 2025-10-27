@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script>
-      if (window.location.hostname === 'roryeagan.com') {
-          var baseTag = document.createElement('base');
-          baseTag.href = '/nba/';
-          document.head.appendChild(baseTag);
-      }
-    </script>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
@@ -15,7 +8,9 @@
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Ball</title>
-  <script defer src="js/main.js"></script></head>
+    <link rel="stylesheet" href="js/style.css" />
+  <script type="module" src="js/main.js"></script>
+  </head>
   <body style="background-color: rgb(234, 235, 237);">
     <section id="root"></section>
   </body>
