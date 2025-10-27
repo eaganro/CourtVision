@@ -14,17 +14,10 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const [showMouse, setShowMouse] = useState(true);
   const [mouseLinePos, setMouseLinePos] = useState(null);
   const [highlightActionIds, setHighlightActionIds] = useState([]);
-  // Tooltip only follows hover now; no click-to-lock
   const [infoLocked, setInfoLocked] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const playRef = useRef(null);
   const tooltipRef = useRef(null);
-
-  // Drag select state
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartX, setDragStartX] = useState(null);
-  const [dragCurrentX, setDragCurrentX] = useState(null);
-  const dragJustEndedRef = useRef(false);
 
   // Keep only a small gap beyond the player name column (90px)
   const leftMargin = 96; // 90 name + 6px padding
@@ -330,57 +323,51 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     }
     setHighlightActionIds(hoverActionIds);
     setDescriptionArray(hoverActions);
-    if (!isDragging) {
-      setMouseLinePos(pos + leftMargin);
-    }
+    setMouseLinePos(pos + leftMargin);
   };
 
   const mouseOver = (e) => {
     updateHoverAt(e.clientX, e.clientY, e.target);
-    if (isDragging) {
-      handleDragMove(e);
-    }
   }
 
   const mouseOut = (e) => {
-    if (!infoLocked && !isDragging) {
+    if (!infoLocked) {
       setMouseLinePos(null);
       setDescriptionArray([]);
       setHighlightActionIds([]);
     }
   }
 
-  // Normal click (without a drag) clears any selection
   const handleClick = (e) => {
-    // If a drag just ended, suppress this click (browser fires click after mouseup)
-    if (dragJustEndedRef.current) {
-      dragJustEndedRef.current = false;
-      e.preventDefault?.();
-      e.stopPropagation?.();
-      return;
+    if (!infoLocked) {
+      // Lock info at current mouse position
+      setInfoLocked(true);
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    } else {
+      // Unlock info, resume normal mouseover
+      setInfoLocked(false);
+      setMouseLinePos(null);
+      setDescriptionArray([]);
+      setHighlightActionIds([]);
     }
-    onSelectRange && onSelectRange(null);
   }
 
   // Touch support: show tooltip while dragging finger over play area
   const onTouchStart = (e) => {
     if (e.touches && e.touches[0]) {
-      handleDragStart(e);
       updateHoverAt(e.touches[0].clientX, e.touches[0].clientY, e.target);
     }
   };
 
   const onTouchMove = (e) => {
     if (e.touches && e.touches[0]) {
-      // Prevent page scroll while dragging/hovering
+      // Prevent page from scrolling while scrubbing timeline
       e.preventDefault();
-      handleDragMove(e);
       updateHoverAt(e.touches[0].clientX, e.touches[0].clientY, e.target);
     }
   };
 
-  const onTouchEnd = (e) => {
-    handleDragEnd(e);
+  const onTouchEnd = () => {
     if (!infoLocked) {
       setMouseLinePos(null);
       setDescriptionArray([]);
@@ -428,8 +415,6 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
       onMouseMove={mouseOver}
       onMouseOut={mouseOut}
       onMouseLeave={mouseOut}
-      onMouseDown={handleDragStart}
-      onMouseUp={handleDragEnd}
       onClick={handleClick}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -479,7 +464,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
               </div>
             </>
           )}
-          {/* No lock state message anymore */}
+          {infoLocked && <div style={{fontSize: '0.9em', color: '#888', marginTop: 4}}>(Locked - click anywhere to unlock)</div>}
         </div>
       )}
       <svg height="600" width={width + leftMargin + rightMargin} className='line'>
@@ -488,32 +473,9 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
         <polyline points={negpoints.join(' ')} style={{"fill": homeColor}}/>
       </svg>
       <svg height="600" width={width + leftMargin + rightMargin} className='line'>
-        {mouseLinePos !== null ? (
+        {mouseLinePos !== null ? 
           <line x1={mouseLinePos} y1={10} x2={mouseLinePos} y2={590} style={{ stroke: 'grey', strokeWidth: 1 }} />
-        ) : null}
-        {(isDragging && dragStartX !== null && dragCurrentX !== null) ? (
-          <rect
-            x={leftMargin + Math.min(dragStartX, dragCurrentX)}
-            y={10}
-            width={Math.abs(dragCurrentX - dragStartX)}
-            height={580}
-            fill="rgba(30,144,255,0.2)"
-            stroke="dodgerblue"
-            strokeWidth="1"
-          />
-        ) : null}
-        {(!isDragging && selectedRangeSecs && selectedRangeSecs.start != null && selectedRangeSecs.end != null) ? (
-          (() => {
-            const totalRegSeconds = 4 * 12 * 60;
-            const startRatio = Math.max(0, Math.min(1, selectedRangeSecs.start / totalRegSeconds));
-            const endRatio = Math.max(0, Math.min(1, selectedRangeSecs.end / totalRegSeconds));
-            const x = leftMargin + width * Math.min(startRatio, endRatio);
-            const w = width * Math.abs(endRatio - startRatio);
-            return (
-              <rect x={x} y={10} width={w} height={580} fill="rgba(30,144,255,0.15)" stroke="dodgerblue" strokeWidth="1" />
-            );
-          })()
-        ) : null}
+          : ''}
       </svg>
       <div class="teamName" style={{color: teamColor[awayTeamNames?.abr]?.replaceAll(' ', ', ')}}>{awayTeamName}</div>
       <div className='teamSection'>

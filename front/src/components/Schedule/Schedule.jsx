@@ -60,7 +60,7 @@ export default function Schedule({ games, date, changeDate, changeGame, isLoadin
             <img height="16" width="16" draggable={false} src={`img/teams/${g.awayteam}.png`}></img>
             {g.awayteam} - {g.hometeam}
             {g.hometeam && (
-              <img height="16" width="16" draggable={false} src={`${PREFIX ? PREFIX : ''}/img/teams/${g.hometeam}.png`} alt={g.hometeam} />
+              <img height="16" width="16" draggable={false} src={`img/teams/${g.hometeam}.png`} alt={g.hometeam} />
             )}
           </div>
           <div>{g.awayscore} - {g.homescore}</div>
@@ -74,7 +74,7 @@ export default function Schedule({ games, date, changeDate, changeGame, isLoadin
             <img height="16" width="16" draggable={false} src={`img/teams/${g.awayteam}.png`}></img>
             {g.awayteam} - {g.hometeam}
             {g.hometeam && (
-              <img height="16" width="16" draggable={false} src={`${PREFIX ? PREFIX : ''}/img/teams/${g.hometeam}.png`} alt={g.hometeam} />
+              <img height="16" width="16" draggable={false} src={`img/teams/${g.hometeam}.png`} alt={g.hometeam} />
             )}
           </div>
           <div className='recordRow'>
