@@ -54,6 +54,9 @@ export default function App() {
   const [isBoxLoading, setIsBoxLoading] = useState(true);
   const [isPlayLoading, setIsPlayLoading] = useState(true);
 
+  const latestBoxRef = useRef(box);
+  const latestPlayByPlayRef = useRef(playByPlay);
+
 
   const [playByPlaySectionWidth, setPlayByPlaySectionWidth] = useState(0);
 
@@ -115,6 +118,14 @@ export default function App() {
     connect();
     // return () => ws?.close();
   }, []);
+
+  useEffect(() => {
+    latestBoxRef.current = box;
+  }, [box]);
+
+  useEffect(() => {
+    latestPlayByPlayRef.current = playByPlay;
+  }, [playByPlay]);
 
   // Keep query params in sync when date or game changes
   const updateQueryParams = useCallback((newDate, newGameId) => {
@@ -210,7 +221,7 @@ export default function App() {
   };
 
   const getPlayByPlay = async (url) => {
-    if (!playByPlay.length) {
+    if (!latestPlayByPlayRef.current.length) {
       setIsPlayLoading(true);
     }
 
@@ -245,7 +256,7 @@ export default function App() {
   }
 
   const getBox = async (url) => {
-    if (!box || Object.keys(box).length === 0) {
+    if (!latestBoxRef.current || Object.keys(latestBoxRef.current).length === 0) {
       setIsBoxLoading(true);
     }
 

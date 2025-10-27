@@ -262,7 +262,7 @@ const targetET = new Date(`${year}-${month}-${day}T13:20:00-04:00`);
 if (nowET > targetET) {
   schedulePolling();
 }
-schedule.scheduleJob({ tz: 'America/New_York', hour: 18, minute: 10 }, schedulePolling);
+schedule.scheduleJob({ tz: 'America/New_York', hour: 13, minute: 0 }, schedulePolling);
 
 async function schedulePolling() {
   await loadManifest();
