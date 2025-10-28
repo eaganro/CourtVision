@@ -3,6 +3,7 @@ import { fixPlayerName } from '../../helpers/utils';
 import { sortActions, filterActions, processScoreTimeline, createPlayers,
   createPlaytimes, updatePlaytimesWithAction, quarterChange, endPlaytimes } from '../../helpers/dataProcessing';
 
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Schedule from '../Schedule/Schedule';
 import Score from '../Score/Score';
@@ -120,6 +121,7 @@ export default function App() {
 
   const [isBoxLoading, setIsBoxLoading] = useState(true);
   const [isPlayLoading, setIsPlayLoading] = useState(true);
+  const [isPlayRefreshing, setIsPlayRefreshing] = useState(false);
 
   const latestBoxRef = useRef(box);
   const latestPlayByPlayRef = useRef(playByPlay);
@@ -336,6 +338,7 @@ export default function App() {
 
     setIsBoxLoading(true);
     setIsPlayLoading(true);
+    setIsPlayRefreshing(false);
     setGameStatusMessage(null);
 
     try {
@@ -398,7 +401,10 @@ export default function App() {
   };
 
   const getPlayByPlay = async (url) => {
-    if (!latestPlayByPlayRef.current.length) {
+    const hasExistingData = latestPlayByPlayRef.current.length > 0;
+    if (hasExistingData) {
+      setIsPlayRefreshing(true);
+    } else {
       setIsPlayLoading(true);
     }
 
@@ -410,12 +416,14 @@ export default function App() {
           setPlayByPlay([]);
           setLastAction(null);
           setNumQs(4);
+          setIsPlayRefreshing(false);
           return;
         }
         if (res.status === 404) {
           setPlayByPlay([]);  
           setLastAction(null);
           setNumQs(4);
+          setIsPlayRefreshing(false);
           return;
         }
         throw new Error(`S3 fetch failed: ${res.status}`);
@@ -437,6 +445,7 @@ export default function App() {
       console.error('Error in getPlayByPlay:', err);
     } finally {
       setIsPlayLoading(false);
+      setIsPlayRefreshing(false);
     }
   }
 
@@ -599,6 +608,11 @@ export default function App() {
         isLoading={isGameDataLoading}
         statusMessage={gameStatusMessage}></Score>
       <div className='playByPlaySection' ref = {playByPlaySectionRef}>
+        {isPlayRefreshing && (
+          <div className='playByPlayRefresh' role='status' aria-label='Updating play-by-play'>
+            <CircularProgress size={14} thickness={4} />
+          </div>
+        )}
         <Play
           awayTeamNames={awayTeamName}
           homeTeamNames={homeTeamName}

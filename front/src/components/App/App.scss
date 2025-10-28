@@ -14,7 +14,21 @@
   }
 }
 .playByPlaySection {
+  position: relative;
   height: 675px;
+}
+
+.playByPlayRefresh {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.playByPlayRefresh .MuiCircularProgress-root {
+  color: #6c6d6f;
 }
 
 // .playByPlaySection {
