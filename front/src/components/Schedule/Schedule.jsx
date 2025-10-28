@@ -19,40 +19,7 @@ export default function Schedule({ games, date, changeDate, changeGame, isLoadin
     changeGame(id);
   }
 
-  const sortedGames = [...games].sort((a,b) => {
-    let datetimeA = new Date(a.starttime);
-    let datetimeB = new Date(b.starttime);
-    if (a.status.startsWith('Final') && b.status.startsWith('Final')) {
-      if (datetimeA < datetimeB) {
-        return -1;
-      } else if (datetimeA > datetimeB) {
-        return 1;
-      } else {
-        if (a.hometeam > b.hometeam) {
-          return 1;
-        } else {
-          return -1;
-        }
-      }
-    } else if (a.status.startsWith('Final')) {
-        return 1;
-    } else if (b.status.startsWith('Final')) {
-      return -1;
-    } else {
-      if (datetimeA < datetimeB) {
-        return -1;
-      } else if (datetimeA > datetimeB) {
-        return 1;
-      } else {
-        if (a.hometeam > b.hometeam) {
-          return 1;
-        } else {
-          return -1;
-        }
-      }
-    }
-  });
-  const gamesList = sortedGames.map(g => {
+  const gamesList = (games || []).map(g => {
     if (!g.status.endsWith('ET')) {
       return (
         <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>

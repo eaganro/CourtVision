@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { fixPlayerName } from '../../helpers/utils';
 import { sortActions, filterActions, processScoreTimeline, createPlayers,
   createPlaytimes, updatePlaytimesWithAction, quarterChange, endPlaytimes } from '../../helpers/dataProcessing';
@@ -45,19 +45,24 @@ const compareGamesForSelection = (a, b) => {
 
   const finalA = statusA.startsWith('Final');
   const finalB = statusB.startsWith('Final');
+  const upcomingA = statusA.endsWith('ET');
+  const upcomingB = statusB.endsWith('ET');
+  const liveA = !!statusA && !finalA && !upcomingA;
+  const liveB = !!statusB && !finalB && !upcomingB;
 
-  if (finalA && finalB) {
+  const bucketA = liveA ? 0 : (upcomingA ? 1 : (finalA ? 2 : 1));
+  const bucketB = liveB ? 0 : (upcomingB ? 1 : (finalB ? 2 : 1));
+  if (bucketA < bucketB) return -1;
+  if (bucketA > bucketB) return 1;
+
+  if (bucketA === 2) {
     if (safeTimeA < safeTimeB) return -1;
     if (safeTimeA > safeTimeB) return 1;
-    if ((a?.hometeam || '') > (b?.hometeam || '')) return 1;
-    if ((a?.hometeam || '') < (b?.hometeam || '')) return -1;
-    return 0;
+  } else {
+    if (safeTimeA < safeTimeB) return -1;
+    if (safeTimeA > safeTimeB) return 1;
   }
-  if (finalA) return 1;
-  if (finalB) return -1;
 
-  if (safeTimeA < safeTimeB) return -1;
-  if (safeTimeA > safeTimeB) return 1;
   if ((a?.hometeam || '') > (b?.hometeam || '')) return 1;
   if ((a?.hometeam || '') < (b?.hometeam || '')) return -1;
   return 0;
@@ -570,11 +575,12 @@ export default function App() {
   };
 
   const isGameDataLoading = isBoxLoading || isPlayLoading;
+  const sortedGamesForSchedule = useMemo(() => sortGamesForSelection(games), [games]);
 
   return (
     <div className='topLevel'>
       <Schedule
-        games={games}
+        games={sortedGamesForSchedule}
         date={date}
         changeDate={changeDate}
         changeGame={changeGame}
