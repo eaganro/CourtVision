@@ -256,7 +256,7 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     
     let negy = 300 + (-1 * (i + 1) * lineJump) * - 300 / maxY
     timeline.unshift(<line key={`sn${i}-${awayTeamName}-${homeTeamName}`} x1={leftMargin - 5} y1={negy} x2={leftMargin + width} y2={negy} strokeDasharray={"5,5"} style={{ stroke: 'darkgrey', strokeWidth: 0.5 }} />)
-    timeline.unshift(<text x={leftMargin - 10} y={negy + 5} text-anchor="end">{-1 * (i + 1) * lineJump}</text>)
+    timeline.unshift(<text x={leftMargin - 10} y={negy + 5} text-anchor="end">{(i + 1) * lineJump}</text>)
   }
 
 
