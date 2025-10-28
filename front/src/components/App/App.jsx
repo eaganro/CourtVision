@@ -609,7 +609,7 @@ export default function App() {
         statusMessage={gameStatusMessage}></Score>
       <div className='playByPlaySection' ref = {playByPlaySectionRef}>
         {isPlayRefreshing && (
-          <div className='playByPlayRefresh' role='status' aria-label='Updating play-by-play'>
+          <div className='dataRefresh' role='status' aria-label='Updating data'>
             <CircularProgress size={14} thickness={4} />
           </div>
         )}
