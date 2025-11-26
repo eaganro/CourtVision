@@ -1,25 +1,27 @@
+import { EVENT_TYPES, LegendShape } from '../../helpers/eventStyles.jsx';
 import './StatButtons.scss';
+
 export default function StatButtons({ statOn, changeStatOn, isLoading, statusMessage }) {
 
-  const color = {
-    point: 'gold',
-    miss: 'brown',
-    rebound: 'blue',
-    assist: 'green',
-    turnover: 'red',
-    block: 'purple',
-    steal: 'pink',
-    foul: 'black'
-  };
+  const eventKeys = Object.keys(EVENT_TYPES);
 
-  const buttons = Object.keys(color).map((k, i) => {
+  const buttons = eventKeys.map((key, i) => {
     if (isLoading || statusMessage) {
-      return <div key={k}></div>;
+      return <div key={key}></div>;
     }
+    
+    const isActive = statOn[i];
+    
     return (
-      <div className='buttonGroup' key={k}>
-        <div className={`statCheck ${k} ${statOn[i] ? '' : 'off'}`} onClick={() => changeStatOn(i)}></div>
-        <span>{k}</span>
+      <div 
+        className={`buttonGroup ${isActive ? '' : 'off'}`} 
+        key={key}
+        onClick={() => changeStatOn(i)}
+      >
+        <div className="shapeContainer">
+          <LegendShape eventType={key} size={18} />
+        </div>
+        <span className="label">{EVENT_TYPES[key].label}</span>
       </div>
     );
   });

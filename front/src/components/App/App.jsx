@@ -131,8 +131,8 @@ export default function App() {
 
 
 
-  // const [statOn, setStatOn] = useState([true, false, true, true, false, false, false, false]);
-  const [statOn, setStatOn] = useState([true, true, true, true, true, true, true, true]);
+  const [statOn, setStatOn] = useState([true, false, true, true, false, false, false, false]);
+  // const [statOn, setStatOn] = useState([true, true, true, true, true, true, true, true]);
   const [numQs, setNumQs] = useState(4);
   const [lastAction, setLastAction] = useState(null);
   const [selectionRangeSecs, setSelectionRangeSecs] = useState(null);

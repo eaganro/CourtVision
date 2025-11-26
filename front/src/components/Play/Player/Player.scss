@@ -1,19 +1,8 @@
 .player {
   position: relative;
-  .dot {
-    height: 5px;
-    width: 5px;
-    position: absolute;
-    display: inline-block;
-    border-radius: 50%;
-    z-index: 10;
-    top: 10px;
-  }
   
   .playerName {
     display: inline-block;
-    // width: 200px;
-  
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -25,7 +14,5 @@
 
   .line {
     position: absolute;
-    // left: 120px;
   }
 }
-

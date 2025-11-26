@@ -1,6 +1,8 @@
 import { timeToSeconds } from '../../../helpers/utils';
+import { getEventType, renderEventShape } from '../../../helpers/eventStyles.jsx';
 
 import './Player.scss';
+
 export default function Player({ actions, timeline, name, width, rightMargin = 0, numQs, heightDivide, highlight, leftMargin }) {
 
   const playerName = name;
@@ -17,54 +19,13 @@ export default function Player({ actions, timeline, name, width, rightMargin = 0
     if (a.period > 4) {
       pos = ((4 * 12 * 60 + 5 * (a.period - 4) * 60 - timeToSeconds(a.clock)) / (4 * 12 * 60)) * (qWidth * 4);
     }
-    let color = 'orange';
-    if (a.description.includes('MISS')) {
-      color = 'brown';
-    } else if (a.description.includes('PTS')) {
-      color = 'gold';
-    } else if (a.description.includes('REBOUND')) {
-      color = 'blue';
-    } else if (a.description.includes('AST')) {
-      color = 'green';
-    } else if (a.description.includes('TO)')) {
-      color = 'red';
-    } else if (a.description.includes('BLK')) {
-      color = 'purple';
-    } else if (a.description.includes('STL')) {
-      color = 'pink';
-    } else if (a.description.includes('PF)')) {
-      color = 'black';
-    }
-    let style = {
-      backgroundColor: color
-    };
-    if (highlight.includes(a.actionId)) {
-      style.width = '10px';
-      style.height = '10px';
-      style.top = '7.5px';
-      style.left = `${pos - 2.5}px`;
-    }
-    if (highlight.includes(a.actionNumber)) {
-      if (a.description.includes('3PT')) {
-        return (
-          <g key={`action-${a.actionNumber}`}>
-            <circle fill={color} cx={pos} cy={"12"} r={"6"} />
-            <circle fill={'red'} cx={pos} cy={"12"} r={"3"} />
-          </g>
-        );
-      }
-      return <circle key={a.actionNumber} fill={color} cx={pos} cy={"12"} r={"6"} />;
-    } else {
-      if (a.description.includes('3PT')) {
-        return (
-          <g key={`action-${a.actionNumber}`}>
-            <circle fill={color} cx={pos} cy={"12"} r={"3"} />
-            <circle fill={'red'} cx={pos} cy={"12"} r={"1.5"} />
-          </g>
-        );
-      }
-      return <circle key={a.actionNumber} fill={color} cx={pos} cy={"12"} r={"3"} />;
-    }
+    
+    const eventType = getEventType(a.description);
+    const is3PT = a.description.includes('3PT');
+    const isHighlighted = highlight.includes(a.actionNumber);
+    const size = isHighlighted ? 8 : 4;
+    
+    return renderEventShape(eventType, pos, 14, size, `action-${a.actionNumber}`, is3PT);
   });
 
   const playTimeLines = timeline?.filter(t => {
@@ -83,14 +44,14 @@ export default function Player({ actions, timeline, name, width, rightMargin = 0
       x2 = ((4 * 12 * 60 + 5 * (t.period - 4) * 60 - timeToSeconds(t.end)) / (4 * 12 * 60)) * (qWidth * 4);
     }
     x2 = isNaN(x2) ? x1 : x2; 
-    return <line key={i} x1={x1} y1={12} x2={x2} y2={12} style={{ stroke: 'rgb(0,0,255)', strokeWidth: 1 }} />
+    return <line key={i} x1={x1} y1={14} x2={x2} y2={14} style={{ stroke: 'rgb(0,0,255)', strokeWidth: 1 }} />
   });
 
 
   return (
     <div className='player' style={{ height: `${275/heightDivide}px`}}>
       <div className='playerName' style={{ width: 90 }}>{playerName}</div>
-      <svg width={width + rightMargin} height="20" className='line' style={{left: leftMargin}}>
+      <svg width={width + rightMargin} height="28" className='line' style={{left: leftMargin}}>
         {playTimeLines}
         {dots}
       </svg>
