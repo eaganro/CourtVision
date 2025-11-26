@@ -13,12 +13,15 @@ export default function StatButtons({ statOn, changeStatOn, isLoading, statusMes
   };
 
   const buttons = Object.keys(color).map((k, i) => {
-    return !isLoading && !statusMessage ? (
+    if (isLoading || statusMessage) {
+      return <div key={k}></div>;
+    }
+    return (
       <div className='buttonGroup' key={k}>
         <div className={`statCheck ${k} ${statOn[i] ? '' : 'off'}`} onClick={() => changeStatOn(i)}></div>
         <span>{k}</span>
       </div>
-    ) : (<div></div>);
+    );
   });
 
   return (

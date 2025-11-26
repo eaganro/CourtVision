@@ -549,8 +549,6 @@ export default function App() {
     });
     allAct = sortActions(allAct);
     
-    console.log(homePlayers)
-    console.log(awayPlayers)
     setAllActions(allAct);
     setAwayActions(awayPlayers);
     setHomeActions(homePlayers);

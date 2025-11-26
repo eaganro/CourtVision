@@ -10,7 +10,6 @@ export default function Boxscore({ box, isLoading, statusMessage }) {
   const [width, setWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    console.log(width);
     function handleResize() {
       setWidth(window.innerWidth);
     }

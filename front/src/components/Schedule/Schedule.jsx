@@ -3,6 +3,7 @@ import { NavigateNext, NavigateBefore } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 import { dateAdd, dateMinus } from '../../environment';
+import { PREFIX } from '../../environment';
 
 
 import './Schedule.scss';
@@ -24,10 +25,10 @@ export default function Schedule({ games, date, changeDate, changeGame, isLoadin
       return (
         <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>
           <div className='iconRow'>
-            <img height="16" width="16" draggable={false} src={`img/teams/${g.awayteam}.png`}></img>
+            <img height="16" width="16" draggable={false} src={`${PREFIX ? PREFIX : ''}/img/teams/${g.awayteam}.png`} alt={g.awayteam}></img>
             {g.awayteam} - {g.hometeam}
             {g.hometeam && (
-              <img height="16" width="16" draggable={false} src={`img/teams/${g.hometeam}.png`} alt={g.hometeam} />
+              <img height="16" width="16" draggable={false} src={`${PREFIX ? PREFIX : ''}/img/teams/${g.hometeam}.png`} alt={g.hometeam} />
             )}
           </div>
           <div>{g.awayscore} - {g.homescore}</div>
@@ -38,10 +39,10 @@ export default function Schedule({ games, date, changeDate, changeGame, isLoadin
       return (
         <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>
           <div className='iconRow'>
-            <img height="16" width="16" draggable={false} src={`img/teams/${g.awayteam}.png`}></img>
+            <img height="16" width="16" draggable={false} src={`${PREFIX ? PREFIX : ''}/img/teams/${g.awayteam}.png`} alt={g.awayteam}></img>
             {g.awayteam} - {g.hometeam}
             {g.hometeam && (
-              <img height="16" width="16" draggable={false} src={`img/teams/${g.hometeam}.png`} alt={g.hometeam} />
+              <img height="16" width="16" draggable={false} src={`${PREFIX ? PREFIX : ''}/img/teams/${g.hometeam}.png`} alt={g.hometeam} />
             )}
           </div>
           <div className='recordRow'>

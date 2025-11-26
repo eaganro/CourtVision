@@ -47,9 +47,9 @@ export default function Player({ actions, timeline, name, width, rightMargin = 0
     if (highlight.includes(a.actionNumber)) {
       if (a.description.includes('3PT')) {
         return (
-          <g>
-            <circle key={a.actionNumber} fill={color} cx={pos} cy={"12"} r={"6"} />
-            <circle key={a.actionNumber + '3PT'} fill={'red'} cx={pos} cy={"12"} r={"3"} />
+          <g key={`action-${a.actionNumber}`}>
+            <circle fill={color} cx={pos} cy={"12"} r={"6"} />
+            <circle fill={'red'} cx={pos} cy={"12"} r={"3"} />
           </g>
         );
       }
@@ -57,9 +57,9 @@ export default function Player({ actions, timeline, name, width, rightMargin = 0
     } else {
       if (a.description.includes('3PT')) {
         return (
-          <g>
-            <circle key={a.actionNumber} fill={color} cx={pos} cy={"12"} r={"3"} />
-            <circle key={a.actionNumber + '3PT'} fill={'red'} cx={pos} cy={"12"} r={"1.5"} />
+          <g key={`action-${a.actionNumber}`}>
+            <circle fill={color} cx={pos} cy={"12"} r={"3"} />
+            <circle fill={'red'} cx={pos} cy={"12"} r={"1.5"} />
           </g>
         );
       }

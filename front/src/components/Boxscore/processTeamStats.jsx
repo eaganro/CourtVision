@@ -16,7 +16,7 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
     freeThrowsMade: 0, freeThrowsAttempted: 0, reboundsOffensive: 0, reboundsDefensive: 0, reboundsTotal: 0,
     assists: 0, steals: 0, blocks: 0, turnovers: 0, foulsPersonal: 0, points: 0, plusMinusPoints:0 };
 
-  let leftCol = [<div className="statHeadings"><span>PLAYER</span></div>];
+  let leftCol = [<div key="stat-heading-player" className="statHeadings"><span>PLAYER</span></div>];
   let teamBox = team.players.filter(p => {
     let minutes = p.statistics.minutes;
     if (!minutes) return false;
@@ -44,7 +44,7 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
     if (minutes.includes('PT')) {
       minutes = minutes.slice(2, -4).replace('M', ':');
     }
-    leftCol.push(<div className={i % 2 === 0 ? "stat even" : "stat odd"}><span className="playerNameCol">{p.firstName} {p.familyName}</span></div>)
+    leftCol.push(<div key={`player-name-${p.personId}`} className={i % 2 === 0 ? "stat even" : "stat odd"}><span className="playerNameCol">{p.firstName} {p.familyName}</span></div>)
     return (
       <div key={p.personId} className={ "rowGrid stat " + (i % 2 === 0 ? "even" : "odd") }>
         <span>{minutes}</span>
@@ -74,7 +74,7 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
     teamBox = teamBox.slice(0, 5);
     leftCol = leftCol.slice(0, 6)
   }
-  leftCol.push(<div className={teamBox.length % 2 === 0 ? 'even' : 'odd'}><span className="playerNameCol">TEAM</span></div>)
+  leftCol.push(<div key="team-total-label" className={teamBox.length % 2 === 0 ? 'even' : 'odd'}><span className="playerNameCol">TEAM</span></div>)
 
   let fg;
   if ((teamTotals.fieldGoalsMade / teamTotals.fieldGoalsAttempted) === 1) {
@@ -104,7 +104,7 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
     ft = 0;
   }
   const totalRow = teamBox && (
-    <div className={ "rowGrid stat " + (teamBox.length % 2 === 0 ? 'even' : 'odd')}>
+    <div key="team-total-row" className={ "rowGrid stat " + (teamBox.length % 2 === 0 ? 'even' : 'odd')}>
       <span></span>
       <span>{teamTotals.fieldGoalsMade}</span>
       <span>{teamTotals.fieldGoalsAttempted}</span>
@@ -129,7 +129,7 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
   );
 
   const statHeadings = (
-    <div className="rowGrid statHeadings">
+    <div key="stat-headings" className="rowGrid statHeadings">
       <span>MIN</span>
       <span>FGM</span>
       <span>FGA</span>
