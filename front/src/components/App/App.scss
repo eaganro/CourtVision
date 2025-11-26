@@ -14,7 +14,8 @@
   }
 }
 .playByPlaySection {
-  height: 675px;
+  min-height: 675px;
+  height: auto;
 }
 
 .dataRefresh {
