@@ -44,7 +44,7 @@ export default function Player({ actions, timeline, name, width, rightMargin = 0
       x2 = ((4 * 12 * 60 + 5 * (t.period - 4) * 60 - timeToSeconds(t.end)) / (4 * 12 * 60)) * (qWidth * 4);
     }
     x2 = isNaN(x2) ? x1 : x2; 
-    return <line key={i} x1={x1} y1={14} x2={x2} y2={14} style={{ stroke: 'rgb(0,0,255)', strokeWidth: 1 }} />
+    return <line key={i} x1={x1} y1={14} x2={x2} y2={14} style={{ stroke: 'darkgrey', strokeWidth: 1.5 }} />
   });
 
 
