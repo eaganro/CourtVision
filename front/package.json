@@ -8,7 +8,7 @@
     "devpi": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
-    "build:prod:upload": "npm run build && aws s3 cp ../server/public/js/main.js s3://roryeagan.com-nba/js/main.js && aws s3 cp ../server/public/js/style.css s3://roryeagan.com-nba/js/style.css"
+    "build:prod:upload": "npm run build && aws s3 cp ../server/public/js/main.js s3://roryeagan.com-nba/js/main.js && aws s3 cp ../server/public/js/style.css s3://roryeagan.com-nba/js/style.css && aws s3 cp ../server/public/index.html s3://roryeagan.com-nba/index.html"
   },
   "author": "",
   "license": "ISC",
