@@ -8,7 +8,7 @@ import { PREFIX } from '../../environment';
 
 import './Schedule.scss';
 
-export default function Schedule({ games, date, changeDate, changeGame, isLoading }) {
+export default function Schedule({ games, date, changeDate, changeGame, isLoading, selectedGameId }) {
 
   const scrollRef = useRef(null);
   const isDragging = useRef(false);
@@ -21,9 +21,13 @@ export default function Schedule({ games, date, changeDate, changeGame, isLoadin
   }
 
   const gamesList = (games || []).map(g => {
-    if (!g.status.endsWith('ET')) {
+    const isUpcoming = g.status.endsWith('ET');
+    const isSelected = g.id === selectedGameId;
+    const gameClassName = `game${isSelected ? ' selected' : ''}`;
+
+    if (!isUpcoming) {
       return (
-        <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>
+        <div className={gameClassName} key={g.id} onClick={() => handleGameClick(g.id)}>
           <div className='iconRow'>
             <img height="16" width="16" draggable={false} src={`${PREFIX ? PREFIX : ''}/img/teams/${g.awayteam}.png`} alt={g.awayteam}></img>
             {g.awayteam} - {g.hometeam}
@@ -37,7 +41,7 @@ export default function Schedule({ games, date, changeDate, changeGame, isLoadin
       )
     } else {
       return (
-        <div className='game' key={g.id} onClick={() => handleGameClick(g.id)}>
+        <div className={gameClassName} key={g.id} onClick={() => handleGameClick(g.id)}>
           <div className='iconRow'>
             <img height="16" width="16" draggable={false} src={`${PREFIX ? PREFIX : ''}/img/teams/${g.awayteam}.png`} alt={g.awayteam}></img>
             {g.awayteam} - {g.hometeam}

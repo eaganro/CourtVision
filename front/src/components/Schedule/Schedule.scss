@@ -73,8 +73,11 @@
           white-space: nowrap;
           cursor: inherit;
   
-          &:hover {
+          &:not(.selected):hover {
             background-color: rgb(230, 231, 233);
+          }
+          &.selected {
+            background-color: #e7f1ff;
           }
           .iconRow {
             display: flex;

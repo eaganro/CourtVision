@@ -596,6 +596,7 @@ export default function App() {
         changeDate={changeDate}
         changeGame={changeGame}
         isLoading={isScheduleLoading}
+        selectedGameId={gameId}
       ></Schedule>
       <Score
         homeTeam={box?.homeTeam?.teamTricode}
