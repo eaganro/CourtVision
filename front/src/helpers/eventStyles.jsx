@@ -195,7 +195,7 @@ export function renderEventShape(eventType, cx, cy, size, key, is3PT = false, ac
  * Render a legend shape (for StatButtons)
  * Returns an SVG element with the shape centered
  */
-export function LegendShape({ eventType, size = 12 }) {
+export function LegendShape({ eventType, size = 12, is3PT = false }) {
   const config = EVENT_TYPES[eventType];
   if (!config) return null;
   
@@ -210,7 +210,7 @@ export function LegendShape({ eventType, size = 12 }) {
       viewBox={`0 0 ${viewSize} ${viewSize}`}
       style={{ display: 'inline-block', verticalAlign: 'middle' }}
     >
-      {renderEventShape(eventType, center, center, size / 2, 'legend-shape')}
+      {renderEventShape(eventType, center, center, size / 2, 'legend-shape', is3PT)}
     </svg>
   );
 }

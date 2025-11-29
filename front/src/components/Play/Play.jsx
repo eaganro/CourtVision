@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { timeToSeconds, formatClock, formatPeriod } from '../../helpers/utils';
-import { getEventType } from '../../helpers/eventStyles.jsx';
+import { getEventType, LegendShape } from '../../helpers/eventStyles.jsx';
 // import getWindowDimensions from '../hooks/windowDimensions';
 
 import Player from './Player/Player';
@@ -518,11 +518,22 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
             // When mouse is in bottom half, put actions first, then time/score at bottom
             <>
               <div className="actions-container">
-                {descriptionArray.map((a, index) => (
-                  <div key={index} className="action-item">
-                    <div className="action-description">{a.description}</div>
-                  </div>
-                ))}
+                {descriptionArray.map((a, index) => {
+                  const eventType = getEventType(a.description);
+                  const is3PT = a.description.includes('3PT');
+                  return (
+                    <div key={index} className="action-item">
+                      <span className="action-symbol">
+                        {eventType ? (
+                          <LegendShape eventType={eventType} size={10} is3PT={is3PT} />
+                        ) : (
+                          <span style={{ color: 'darkgrey', fontWeight: 'bold' }}>—</span>
+                        )}
+                      </span>
+                      <div className="action-description">{a.description}</div>
+                    </div>
+                  );
+                })}
               </div>
               {descriptionArray[0] && (
                 <div className="time-score-header bottom">
@@ -541,11 +552,22 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
                 </div>
               )}
               <div className="actions-container">
-                {descriptionArray.map((a, index) => (
-                  <div key={index} className="action-item">
-                    <div className="action-description">{a.description}</div>
-                  </div>
-                ))}
+                {descriptionArray.map((a, index) => {
+                  const eventType = getEventType(a.description);
+                  const is3PT = a.description.includes('3PT');
+                  return (
+                    <div key={index} className="action-item">
+                      <span className="action-symbol">
+                        {eventType ? (
+                          <LegendShape eventType={eventType} size={10} is3PT={is3PT} />
+                        ) : (
+                          <span style={{ color: 'darkgrey', fontWeight: 'bold' }}>—</span>
+                        )}
+                      </span>
+                      <div className="action-description">{a.description}</div>
+                    </div>
+                  );
+                })}
               </div>
             </>
           )}

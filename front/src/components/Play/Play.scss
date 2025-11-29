@@ -64,10 +64,28 @@
     
     .actions-container {
       .action-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
         margin-bottom: 6px;
         
         &:last-child {
           margin-bottom: 0;
+        }
+        
+        .action-symbol {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 14px;
+          // Match the line-height of the first text line (0.95em * 1.4 ≈ 1.33em)
+          height: calc(0.95em * 1.4);
+          
+          svg {
+            display: block;
+            margin-top: 1px; // fine-tune vertical centering
+          }
         }
         
         .action-description {
