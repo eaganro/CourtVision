@@ -58,7 +58,8 @@ export function addAssistActions(a, players) {
     personId: players[name][0]?.personId,
     playerName: players[name][0]?.playerName,
     playerNameI: players[name][0]?.playerNameI,
-    period: a.period
+    period: a.period,
+    teamTricode: a.teamTricode
   });
   return players;
 }
