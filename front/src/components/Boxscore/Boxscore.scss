@@ -12,7 +12,7 @@
 
   .rowGrid {
     display: grid;
-    grid-template-columns: 65px repeat(19, 50px);
+    grid-template-columns: 75px 55px repeat(3, 65px 50px) repeat(9, 60px);
     justify-content: center;
     width: fit-content;
     margin: auto;

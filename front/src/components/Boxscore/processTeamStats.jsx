@@ -48,24 +48,21 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
     return (
       <div key={p.personId} className={ "rowGrid stat " + (i % 2 === 0 ? "even" : "odd") }>
         <span>{minutes}</span>
-        <span>{p.statistics.fieldGoalsMade}</span>
-        <span>{p.statistics.fieldGoalsAttempted}</span>
+        <span>{p.statistics.points}</span>
+        <span>{p.statistics.fieldGoalsMade}-{p.statistics.fieldGoalsAttempted}</span>
         <span>{p.statistics.fieldGoalsPercentage === 1 ? 100 : (Math.round(p.statistics.fieldGoalsPercentage * 100 * 10) / 10).toFixed(1)}</span>
-        <span>{p.statistics.threePointersMade}</span>
-        <span>{p.statistics.threePointersAttempted}</span>
+        <span>{p.statistics.threePointersMade}-{p.statistics.threePointersAttempted}</span>
         <span>{p.statistics.threePointersPercentage === 1 ? 100 : (Math.round(p.statistics.threePointersPercentage * 100 * 10) / 10).toFixed(1)}</span>
-        <span>{p.statistics.freeThrowsMade}</span>
-        <span>{p.statistics.freeThrowsAttempted}</span>
+        <span>{p.statistics.freeThrowsMade}-{p.statistics.freeThrowsAttempted}</span>
         <span>{p.statistics.freeThrowsPercentage === 1 ? 100 : (Math.round(p.statistics.freeThrowsPercentage * 100 * 10) / 10).toFixed(1)}</span>
+        <span>{p.statistics.reboundsTotal}</span>
         <span>{p.statistics.reboundsOffensive}</span>
         <span>{p.statistics.reboundsDefensive}</span>
-        <span>{p.statistics.reboundsTotal}</span>
         <span>{p.statistics.assists}</span>
         <span>{p.statistics.steals}</span>
         <span>{p.statistics.blocks}</span>
         <span>{p.statistics.turnovers}</span>
         <span>{p.statistics.foulsPersonal}</span>
-        <span>{p.statistics.points}</span>
         <span>{p.statistics.plusMinusPoints}</span>
       </div>
     )
@@ -106,24 +103,21 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
   const totalRow = teamBox && (
     <div key="team-total-row" className={ "rowGrid stat " + (teamBox.length % 2 === 0 ? 'even' : 'odd')}>
       <span></span>
-      <span>{teamTotals.fieldGoalsMade}</span>
-      <span>{teamTotals.fieldGoalsAttempted}</span>
+      <span>{teamTotals.points}</span>
+      <span>{teamTotals.fieldGoalsMade}-{teamTotals.fieldGoalsAttempted}</span>
       <span>{fg}</span>
-      <span>{teamTotals.threePointersMade}</span>
-      <span>{teamTotals.threePointersAttempted}</span>
+      <span>{teamTotals.threePointersMade}-{teamTotals.threePointersAttempted}</span>
       <span>{pt3}</span>
-      <span>{teamTotals.freeThrowsMade}</span>
-      <span>{teamTotals.freeThrowsAttempted}</span>
+      <span>{teamTotals.freeThrowsMade}-{teamTotals.freeThrowsAttempted}</span>
       <span>{ft}</span>
+      <span>{teamTotals.reboundsTotal}</span>
       <span>{teamTotals.reboundsOffensive}</span>
       <span>{teamTotals.reboundsDefensive}</span>
-      <span>{teamTotals.reboundsTotal}</span>
       <span>{teamTotals.assists}</span>
       <span>{teamTotals.steals}</span>
       <span>{teamTotals.blocks}</span>
       <span>{teamTotals.turnovers}</span>
       <span>{teamTotals.foulsPersonal}</span>
-      <span>{teamTotals.points}</span>
       <span></span>
     </div>
   );
@@ -131,24 +125,21 @@ export default function(team, showButton, showMore, setShowMore, scrollPos, setS
   const statHeadings = (
     <div key="stat-headings" className="rowGrid statHeadings">
       <span>MIN</span>
-      <span>FGM</span>
-      <span>FGA</span>
+      <span>PTS</span>
+      <span>FGM-A</span>
       <span>FG%</span>
-      <span>3PM</span>
-      <span>3PA</span>
+      <span>3PM-A</span>
       <span>3P%</span>
-      <span>FTM</span>
-      <span>FTA</span>
+      <span>FTM-A</span>
       <span>FT%</span>
+      <span>REB</span>
       <span>OREB</span>
       <span>DREB</span>
-      <span>REB</span>
       <span>AST</span>
       <span>STL</span>
       <span>BLK</span>
       <span>TO</span>
       <span>PF</span>
-      <span>PTS</span>
       <span>+/-</span>
     </div>
   );
