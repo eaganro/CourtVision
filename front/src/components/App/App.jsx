@@ -122,6 +122,7 @@ export default function App() {
   const [isBoxLoading, setIsBoxLoading] = useState(true);
   const [isPlayLoading, setIsPlayLoading] = useState(true);
   const [isPlayRefreshing, setIsPlayRefreshing] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const latestBoxRef = useRef(box);
   const latestPlayByPlayRef = useRef(playByPlay);
@@ -344,6 +345,19 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('statOn', JSON.stringify(statOn));
   }, [statOn]);
+
+  // Delay showing loading indicator by 500ms to avoid flashing for fast loads
+  useEffect(() => {
+    const isLoading = isBoxLoading || isPlayLoading || isScheduleLoading;
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setShowLoading(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowLoading(false);
+    }
+  }, [isBoxLoading, isPlayLoading, isScheduleLoading]);
 
   const getBoth = async () => {
     const boxUrl  = `${PREFIX}/data/boxData/${gameId}.json.gz`;
@@ -598,7 +612,7 @@ export default function App() {
     abr: box?.homeTeam?.teamTricode || '',
   };
 
-  const isGameDataLoading = isBoxLoading || isPlayLoading;
+  const isGameDataLoading = (isBoxLoading || isPlayLoading) && showLoading;
   const sortedGamesForSchedule = useMemo(() => sortGamesForSelection(games), [games]);
 
   return (
@@ -608,7 +622,7 @@ export default function App() {
         date={date}
         changeDate={changeDate}
         changeGame={changeGame}
-        isLoading={isScheduleLoading}
+        isLoading={isScheduleLoading && showLoading}
         selectedGameId={gameId}
       ></Schedule>
       <Score
@@ -637,15 +651,15 @@ export default function App() {
           numQs={numQs}
           sectionWidth={playByPlaySectionWidth}
           lastAction={lastAction}
-          isLoading={isPlayLoading}
+          isLoading={isPlayLoading && showLoading}
           statusMessage={gameStatusMessage}></Play>
         <StatButtons
           statOn={statOn}
           changeStatOn={changeStatOn}
-          isLoading={isPlayLoading}
+          isLoading={isPlayLoading && showLoading}
           statusMessage={gameStatusMessage}></StatButtons>
       </div>
-      <Boxscore box={box} isLoading={isBoxLoading} statusMessage={gameStatusMessage}></Boxscore>
+      <Boxscore box={box} isLoading={isBoxLoading && showLoading} statusMessage={gameStatusMessage}></Boxscore>
     </div>
   );
 }
