@@ -2,14 +2,27 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const ThemeContext = createContext();
 
+// Check if user has a system color scheme preference
+function getSystemPreference() {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
+  
+  // If user has explicitly set a system preference, use it
+  if (prefersDark.matches) return true;
+  if (prefersLight.matches) return false;
+  
+  // No system preference set, default to dark mode
+  return true;
+}
+
 export function ThemeProvider({ children }) {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     if (saved !== null) {
       return JSON.parse(saved);
     }
-    // Check system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Check system preference, default to dark if none set
+    return getSystemPreference();
   });
 
   useEffect(() => {
@@ -20,11 +33,11 @@ export function ThemeProvider({ children }) {
   // Listen for system preference changes
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => {
+    const handleChange = () => {
       const saved = localStorage.getItem('darkMode');
       // Only follow system if user hasn't explicitly set a preference
       if (saved === null) {
-        setIsDarkMode(e.matches);
+        setIsDarkMode(getSystemPreference());
       }
     };
     mediaQuery.addEventListener('change', handleChange);
