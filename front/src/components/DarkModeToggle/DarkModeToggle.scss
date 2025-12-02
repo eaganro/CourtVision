@@ -1,5 +1,5 @@
 .dark-mode-toggle {
-  position: fixed;
+  position: absolute;
   top: 12px;
   right: 12px;
   z-index: 9999;
@@ -25,9 +25,15 @@
   }
   
   .toggle-icon {
-    font-size: 14px;
+    font-size: 12px;
     z-index: 1;
     transition: opacity 0.2s ease;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
     
     &.sun {
       opacity: 1;
