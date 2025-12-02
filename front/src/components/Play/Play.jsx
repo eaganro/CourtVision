@@ -3,6 +3,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { timeToSeconds, formatClock, formatPeriod } from '../../helpers/utils';
 import { getEventType, LegendShape } from '../../helpers/eventStyles.jsx';
 import { getMatchupColors, getSafeBackground } from '../../helpers/teamColors';
+import { useTheme } from '../hooks/useTheme';
 
 import Player from './Player/Player';
 
@@ -19,6 +20,9 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const playRef = useRef(null);
   const tooltipRef = useRef(null);
+  
+  // Subscribe to theme changes to re-render with correct team colors
+  const { isDarkMode } = useTheme();
 
   // Keep only a small gap beyond the player name column (90px)
   const leftMargin = 96; // 90 name + 6px padding
@@ -28,7 +32,8 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
   const homeTeamName = homeTeamNames.name;
 
   // Get team colors, with away using secondary if colors clash with home
-  const teamColors = getMatchupColors(awayTeamNames.abr, homeTeamNames.abr);
+  // Pass isDarkMode to get the correct color palette
+  const teamColors = getMatchupColors(awayTeamNames.abr, homeTeamNames.abr, isDarkMode);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -495,8 +500,8 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     }
   };
 
-  let awayColor = teamColors.away ? getSafeBackground(teamColors.away) : '';
-  let homeColor = teamColors.home ? getSafeBackground(teamColors.home) : '';
+  let awayColor = teamColors.away ? getSafeBackground(teamColors.away, isDarkMode) : '';
+  let homeColor = teamColors.home ? getSafeBackground(teamColors.home, isDarkMode) : '';
 
   // Calculate preferred tooltip placement (left/right, above/below) and clamp within play area
   const tooltipWidth = 300; // matches CSS width

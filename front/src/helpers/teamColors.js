@@ -33,6 +33,40 @@ const nbaTeamColors = {
     WAS: { primary: '#002B5C', secondary: '#E31837' }       // Navy / Red
   };
 
+// Dark mode variants - brighter/more saturated versions that pop on dark backgrounds
+const nbaTeamColorsDark = {
+    ATL: { primary: '#FF5A5E', secondary: '#E0F050' },      // Brighter Red / Volt
+    BOS: { primary: '#00B84A', secondary: '#D4B06A' },      // Brighter Green / Gold
+    BKN: { primary: '#888888', secondary: '#AAAAAA' },      // Gray (visible on dark) / Light Grey
+    CHA: { primary: '#4A3A90', secondary: '#00B8BC' },      // Brighter Purple / Teal
+    CHI: { primary: '#FF3A5A', secondary: '#666666' },      // Brighter Red / Gray
+    CLE: { primary: '#B8004A', secondary: '#FFD040' },      // Brighter Wine / Gold
+    DAL: { primary: '#2080C0', secondary: '#4070A0' },      // Brighter Royal / Navy
+    DEN: { primary: '#3A5A80', secondary: '#FFD840' },      // Brighter Blue / Yellow
+    DET: { primary: '#4A70E0', secondary: '#E83050' },      // Brighter Royal / Red
+    GSW: { primary: '#4070C0', secondary: '#FFD840' },      // Brighter Blue / Yellow
+    HOU: { primary: '#FF3A5A', secondary: '#666666' },      // Brighter Red / Gray
+    IND: { primary: '#2060A0', secondary: '#FFD040' },      // Brighter Navy / Yellow
+    LAC: { primary: '#4070C0', secondary: '#E83050' },      // Brighter Navy / Red
+    LAL: { primary: '#7848B0', secondary: '#FFD040' },      // Brighter Purple / Gold
+    MEM: { primary: '#7A96D0', secondary: '#3A4A70' },      // Brighter Blue / Navy
+    MIA: { primary: '#C8204A', secondary: '#FFB838' },      // Brighter Red / Yellow
+    MIL: { primary: '#10802A', secondary: '#666666' },      // Brighter Green / Gray
+    MIN: { primary: '#3A6090', secondary: '#4890C8' },      // Brighter Navy / Lake Blue
+    NOP: { primary: '#3060A0', secondary: '#D0B878' },      // Brighter Navy / Gold
+    NYK: { primary: '#20A0E8', secondary: '#FFA040' },      // Brighter Blue / Orange
+    OKC: { primary: '#20B8F0', secondary: '#FF6040' },      // Brighter Blue / Orange
+    ORL: { primary: '#20A0E8', secondary: '#666666' },      // Brighter Blue / Gray
+    PHI: { primary: '#20A0E8', secondary: '#FF4070' },      // Brighter Blue / Red
+    PHX: { primary: '#4A3A90', secondary: '#FF8040' },      // Brighter Purple / Orange
+    POR: { primary: '#FF5A5E', secondary: '#666666' },      // Brighter Red / Gray
+    SAC: { primary: '#8050B8', secondary: '#8898A8' },      // Brighter Purple / Gray
+    SAS: { primary: '#909090', secondary: '#B0B0B0' },      // Light Gray / Lighter Gray (visible!)
+    TOR: { primary: '#FF3A5A', secondary: '#666666' },      // Brighter Red / Gray
+    UTA: { primary: '#7848B0', secondary: '#666666' },      // Brighter Purple / Gray
+    WAS: { primary: '#3060A0', secondary: '#FF4858' }       // Brighter Navy / Red
+  };
+
 // Convert hex color to RGB object
 function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -69,9 +103,11 @@ function areColorsTooClose(hex1, hex2, threshold = 220) {
 }
 
 // Get team colors for a matchup, using secondary for away if colors clash
-function getMatchupColors(awayAbr, homeAbr) {
-  const awayTeam = nbaTeamColors[awayAbr];
-  const homeTeam = nbaTeamColors[homeAbr];
+// Pass isDarkMode explicitly for React state synchronization
+function getMatchupColors(awayAbr, homeAbr, darkMode = false) {
+  const colorSet = darkMode ? nbaTeamColorsDark : nbaTeamColors;
+  const awayTeam = colorSet[awayAbr];
+  const homeTeam = colorSet[homeAbr];
 
   if (!awayTeam || !homeTeam) {
     return {
@@ -95,19 +131,30 @@ function getMatchupColors(awayAbr, homeAbr) {
 }
 
 // Get a safe background color that remains visible even for light colors
-// Light colors (gold, silver) are darkened and given higher opacity
-// Dark colors (navy, black) use standard low opacity
-function getSafeBackground(hexColor) {
+// Adjusts based on dark/light mode for optimal visibility
+// Pass isDarkMode explicitly for React state synchronization
+function getSafeBackground(hexColor, darkMode = false) {
   const color = tinycolor(hexColor);
   
+  if (darkMode) {
+    // Dark mode: use higher opacity and brighten dark colors
+    if (color.isDark()) {
+      // Lighten very dark colors and use higher opacity
+      return color.lighten(20).setAlpha(0.5).toRgbString();
+    }
+    // For bright colors in dark mode, just increase opacity
+    return color.setAlpha(0.45).toRgbString();
+  }
+  
+  // Light mode (original behavior)
   if (color.isLight()) {
     // Darken light colors and bump opacity to keep them visible
     return color.darken(25).setAlpha(0.25).toRgbString();
   }
   
-  // For dark colors, standard low opacity is fine
+  // For dark colors on light background, standard low opacity is fine
   return color.setAlpha(0.15).toRgbString();
 }
 
 export default nbaTeamColors;
-export { hexToRgb, colorDistance, areColorsTooClose, getMatchupColors, getSafeBackground };
+export { hexToRgb, colorDistance, areColorsTooClose, getMatchupColors, getSafeBackground, nbaTeamColorsDark };
