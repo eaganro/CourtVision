@@ -56,6 +56,71 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
     };
   }, [infoLocked]);
 
+  // Keyboard navigation for locked tooltip
+  useEffect(() => {
+    if (!infoLocked || !allActions || allActions.length === 0) return;
+
+    const handleKeyDown = (ev) => {
+      if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') return;
+      ev.preventDefault();
+
+      // Find current action and its time
+      const currentActionId = highlightActionIds[0];
+      const currentIndex = allActions.findIndex(a => a.actionNumber === currentActionId);
+      if (currentIndex === -1) return;
+
+      const currentAction = allActions[currentIndex];
+      const currentClock = currentAction.clock;
+      const currentPeriod = currentAction.period;
+
+      // Find next action at a DIFFERENT time (skip all same-time actions)
+      let newIndex;
+      if (ev.key === 'ArrowLeft') {
+        // Search backwards for an action at a different time
+        newIndex = currentIndex - 1;
+        while (newIndex >= 0 && 
+               allActions[newIndex].clock === currentClock && 
+               allActions[newIndex].period === currentPeriod) {
+          newIndex--;
+        }
+        if (newIndex < 0) return; // Already at first time group
+      } else {
+        // Search forwards for an action at a different time
+        newIndex = currentIndex + 1;
+        while (newIndex < allActions.length && 
+               allActions[newIndex].clock === currentClock && 
+               allActions[newIndex].period === currentPeriod) {
+          newIndex++;
+        }
+        if (newIndex >= allActions.length) return; // Already at last time group
+      }
+
+      const newAction = allActions[newIndex];
+
+      // Collect all actions at this new time (same clock and period)
+      const sameTimeActions = allActions.filter(
+        a => a.clock === newAction.clock && a.period === newAction.period
+      );
+      const newActionIds = sameTimeActions.map(a => a.actionNumber);
+
+      // Calculate position for the new action
+      const qWidth = (sectionWidth - leftMargin - rightMargin) / 4;
+      let actionPos;
+      if (newAction.period > 4) {
+        actionPos = ((4 * 12 * 60 + 5 * (newAction.period - 4) * 60 - timeToSeconds(newAction.clock)) / (4 * 12 * 60)) * (qWidth * 4);
+      } else {
+        actionPos = (((newAction.period - 1) * 12 * 60 + 12 * 60 - timeToSeconds(newAction.clock)) / (4 * 12 * 60)) * (qWidth * 4);
+      }
+
+      setHighlightActionIds(newActionIds);
+      setDescriptionArray(sameTimeActions);
+      setMouseLinePos(actionPos + leftMargin);
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [infoLocked, highlightActionIds, allActions, sectionWidth, leftMargin]);
+
   if (isLoading) {
     return (
       <div className='play'>
@@ -557,7 +622,12 @@ export default function Play({ awayTeamNames, homeTeamNames, awayPlayers, homePl
               </div>
             </>
           )}
-          {infoLocked && <div style={{fontSize: '0.9em', color: '#888', marginTop: 4}}>(Locked - click anywhere to unlock)</div>}
+          {infoLocked && (
+            <div style={{fontSize: '0.85em', color: '#888', marginTop: 6, lineHeight: 1.4}}>
+              <div>Click anywhere to unlock</div>
+              <div style={{marginTop: 2}}>← → to navigate events</div>
+            </div>
+          )}
         </div>
       )}
       <svg height="600" width={width + leftMargin + rightMargin} className='line'>
