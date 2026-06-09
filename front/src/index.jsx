@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './components/App/App';
 import { ThemeProvider } from './components/hooks/ui/useTheme';
 import posthog from 'posthog-js';
@@ -17,11 +18,21 @@ if (posthogKey) {
   trackPostHogPageView();
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
 function RootComponent() {
   return (
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

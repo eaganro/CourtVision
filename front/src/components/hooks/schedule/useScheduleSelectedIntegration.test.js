@@ -1,7 +1,23 @@
 import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { useScheduleState } from './useScheduleState';
 import { useSelectedGameState } from './useSelectedGameState';
+
+function createQueryWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+  return function QueryWrapper({ children }) {
+    return createElement(QueryClientProvider, { client: queryClient }, children);
+  };
+}
 
 function useScheduleSelectedSeam({ initialDate, initialGameId, schedule, isScheduleLoading }) {
   const resetLoadingStates = vi.fn();
@@ -58,6 +74,7 @@ describe('schedule + selected game seam', () => {
           data: schedule,
           isScheduleLoading: false,
         },
+        wrapper: createQueryWrapper(),
       },
     );
 

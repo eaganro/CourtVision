@@ -1,6 +1,22 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createElement } from 'react';
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { useScheduleState } from './useScheduleState';
+
+function createQueryWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+  return function QueryWrapper({ children }) {
+    return createElement(QueryClientProvider, { client: queryClient }, children);
+  };
+}
 
 afterEach(() => {
   vi.useRealTimers();
@@ -20,16 +36,18 @@ describe('useScheduleState', () => {
       }),
     });
 
-    const { result } = renderHook(() =>
-      useScheduleState({
-        initialDate: null,
-        initialGameId: null,
-        gameId: null,
-        setGameId,
-        schedule: [],
-        isScheduleLoading: false,
-        fetchScheduleWithReason,
-      }),
+    const { result } = renderHook(
+      () =>
+        useScheduleState({
+          initialDate: null,
+          initialGameId: null,
+          gameId: null,
+          setGameId,
+          schedule: [],
+          isScheduleLoading: false,
+          fetchScheduleWithReason,
+        }),
+      { wrapper: createQueryWrapper() },
     );
 
     await waitFor(() => {
@@ -44,43 +62,47 @@ describe('useScheduleState', () => {
   it('auto-selects the top sorted game once schedule is ready and no game is selected', () => {
     const setGameId = vi.fn();
 
-    renderHook(() =>
-      useScheduleState({
-        initialDate: '2026-02-03',
-        initialGameId: null,
-        gameId: null,
-        setGameId,
-        schedule: [
-          {
-            id: '2026-02-03-lal-bos',
-            status: 'Q1 11:00',
-            starttime: '2026-02-03T20:00:00',
-          },
-          {
-            id: '2026-02-03-phi-gsw',
-            status: 'Final',
-            starttime: '2026-02-03T18:00:00',
-          },
-        ],
-        isScheduleLoading: false,
-        fetchScheduleWithReason: vi.fn(),
-      }),
+    renderHook(
+      () =>
+        useScheduleState({
+          initialDate: '2026-02-03',
+          initialGameId: null,
+          gameId: null,
+          setGameId,
+          schedule: [
+            {
+              id: '2026-02-03-lal-bos',
+              status: 'Q1 11:00',
+              starttime: '2026-02-03T20:00:00',
+            },
+            {
+              id: '2026-02-03-phi-gsw',
+              status: 'Final',
+              starttime: '2026-02-03T18:00:00',
+            },
+          ],
+          isScheduleLoading: false,
+          fetchScheduleWithReason: vi.fn(),
+        }),
+      { wrapper: createQueryWrapper() },
     );
 
     expect(setGameId).toHaveBeenCalledWith('2026-02-03-lal-bos');
   });
 
   it('exposes a value-based changeDate API', () => {
-    const { result } = renderHook(() =>
-      useScheduleState({
-        initialDate: '2026-02-03',
-        initialGameId: null,
-        gameId: '2026-02-03-lal-bos',
-        setGameId: vi.fn(),
-        schedule: [],
-        isScheduleLoading: false,
-        fetchScheduleWithReason: vi.fn(),
-      }),
+    const { result } = renderHook(
+      () =>
+        useScheduleState({
+          initialDate: '2026-02-03',
+          initialGameId: null,
+          gameId: '2026-02-03-lal-bos',
+          setGameId: vi.fn(),
+          schedule: [],
+          isScheduleLoading: false,
+          fetchScheduleWithReason: vi.fn(),
+        }),
+      { wrapper: createQueryWrapper() },
     );
 
     act(() => {
@@ -103,16 +125,18 @@ describe('useScheduleState', () => {
       }),
     });
 
-    const { result } = renderHook(() =>
-      useScheduleState({
-        initialDate: null,
-        initialGameId: null,
-        gameId: null,
-        setGameId,
-        schedule: [],
-        isScheduleLoading: false,
-        fetchScheduleWithReason,
-      }),
+    const { result } = renderHook(
+      () =>
+        useScheduleState({
+          initialDate: null,
+          initialGameId: null,
+          gameId: null,
+          setGameId,
+          schedule: [],
+          isScheduleLoading: false,
+          fetchScheduleWithReason,
+        }),
+      { wrapper: createQueryWrapper() },
     );
 
     await waitFor(() => {

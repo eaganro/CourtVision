@@ -1,4 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createElement } from 'react';
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { useGameData } from './useGameData';
 import { GAME_NOT_STARTED_MESSAGE } from '../../../domain/game-selection/status';
@@ -19,6 +21,20 @@ function createResponse(payload, { status = 200, ok = true } = {}) {
   };
 }
 
+function renderUseGameData() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+  const wrapper = ({ children }) =>
+    createElement(QueryClientProvider, { client: queryClient }, children);
+
+  return renderHook(() => useGameData(), { wrapper });
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
@@ -31,7 +47,7 @@ describe('useGameData', () => {
         createResponse(null, { status: statusCode, ok: false }),
       );
 
-      const { result } = renderHook(() => useGameData());
+      const { result } = renderUseGameData();
 
       await act(async () => {
         await result.current.fetchGamePack({ gameId: '2026-02-03-phi-gsw' });
@@ -54,7 +70,7 @@ describe('useGameData', () => {
     const deferred = createDeferred();
     vi.spyOn(globalThis, 'fetch').mockReturnValue(deferred.promise);
 
-    const { result } = renderHook(() => useGameData());
+    const { result } = renderUseGameData();
 
     act(() => {
       result.current.setGameNotStarted();
@@ -95,7 +111,7 @@ describe('useGameData', () => {
     const deferred = createDeferred();
     vi.spyOn(globalThis, 'fetch').mockReturnValue(deferred.promise);
 
-    const { result } = renderHook(() => useGameData());
+    const { result } = renderUseGameData();
 
     act(() => {
       result.current.setGameNotStarted();
@@ -186,7 +202,7 @@ describe('useGameData', () => {
         }),
       );
 
-    const { result } = renderHook(() => useGameData());
+    const { result } = renderUseGameData();
 
     act(() => {
       result.current.setGameNotStarted();

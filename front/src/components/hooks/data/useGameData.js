@@ -1,14 +1,22 @@
-import { useState, useCallback } from 'react';
-import { PREFIX } from '../../../environment';
+import { useState, useCallback, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { GAME_NOT_STARTED_MESSAGE } from '../../../domain/game-selection/status';
-import { classifyFetchResult, fetchJson } from '../../../data/apiClient';
-import { adaptGamePackPayload, DEFAULT_GAMEPACK_STATE } from '../../../data/gamepackAdapter';
-import { normalizeSchedulePayload } from '../../../data/scheduleAdapter';
+import { DEFAULT_GAMEPACK_STATE } from '../../../data/gamepackAdapter';
+import {
+  createDefaultGamePackResult,
+  fetchGamePackData,
+  fetchScheduleData,
+  gamePackQueryKey,
+  gamePackUrlQueryKey,
+  scheduleQueryKey,
+} from '../../../data/gameQueries';
 
 /**
  * Hook for fetching and managing game data (box score, play-by-play, and schedule)
  */
 export function useGameData() {
+  const queryClient = useQueryClient();
+  const activeGameIdRef = useRef(null);
   const [box, setBox] = useState(DEFAULT_GAMEPACK_STATE.box);
   const [playByPlay, setPlayByPlay] = useState(DEFAULT_GAMEPACK_STATE.playByPlay);
   const [awayTeamId, setAwayTeamId] = useState(DEFAULT_GAMEPACK_STATE.awayTeamId);
@@ -49,25 +57,6 @@ export function useGameData() {
     applyGameDataState(DEFAULT_GAMEPACK_STATE);
   }, [applyGameDataState]);
 
-  const transitionGameSuccess = useCallback((payload) => {
-    const adapted = adaptGamePackPayload(payload);
-    setGameStatusMessage(null);
-    setNbaGameId(adapted.nbaGameId);
-
-    if (adapted.hasBoxData) {
-      setBox(adapted.boxData);
-      setAwayTeamId(adapted.awayTeamId);
-      setHomeTeamId(adapted.homeTeamId);
-    }
-
-    if (adapted.hasPlayData) {
-      setNumPeriods(adapted.numPeriods);
-      setLastAction(adapted.lastAction);
-      setPlayByPlay(adapted.playData);
-      setCaptions(adapted.captions);
-    }
-  }, []);
-
   const transitionGameError = useCallback((errorLike) => {
     console.error('Error in fetchGamePack:', errorLike);
   }, []);
@@ -80,67 +69,90 @@ export function useGameData() {
     setIsPlayLoading(false);
   }, []);
 
-  const fetchSchedule = useCallback(async (dateString) => {
-    if (!dateString) return;
+  const fetchSchedule = useCallback(
+    async (dateString) => {
+      if (!dateString) return;
 
-    setIsScheduleLoading(true);
-    const url = `${PREFIX}/schedule/${dateString}.json.gz`;
+      setIsScheduleLoading(true);
 
-    try {
-      const result = await fetchJson(url);
-      const outcome = classifyFetchResult(result);
-
-      if (outcome === 'success') {
-        setSchedule(normalizeSchedulePayload(result.data));
-        return;
+      try {
+        const nextSchedule = await queryClient.fetchQuery({
+          queryKey: scheduleQueryKey(dateString),
+          queryFn: () => fetchScheduleData(dateString),
+        });
+        setSchedule(nextSchedule);
+      } finally {
+        setIsScheduleLoading(false);
       }
-
-      if (outcome === 'not-available') {
-        setSchedule([]);
-        return;
-      }
-
-      console.error(
-        'Error in fetchSchedule:',
-        result.error || `Schedule fetch failed: ${result.status}`,
-      );
-      setSchedule([]);
-    } finally {
-      setIsScheduleLoading(false);
-    }
-  }, []);
+    },
+    [queryClient],
+  );
 
   const fetchGamePack = useCallback(
     async ({ gameId, url, showLoading = true } = {}) => {
       if (!gameId && !url) return;
-      const requestUrl = url || `${PREFIX}/data/gamepack/${gameId}.json.gz`;
+      if (gameId) {
+        activeGameIdRef.current = gameId;
+      }
       transitionGameLoading(showLoading);
 
       try {
-        const result = await fetchJson(requestUrl);
-        const outcome = classifyFetchResult(result);
+        const queryKey = url ? gamePackUrlQueryKey(url) : gamePackQueryKey(gameId);
+        const activeGameId = gameId || activeGameIdRef.current;
+        const currentState = {
+          box,
+          playByPlay,
+          awayTeamId,
+          homeTeamId,
+          nbaGameId,
+          numPeriods,
+          lastAction,
+          captions,
+          gameStatusMessage,
+        };
+        const previousState =
+          (activeGameId ? queryClient.getQueryData(gamePackQueryKey(activeGameId))?.state : null) ||
+          currentState ||
+          createDefaultGamePackResult();
+        const result = await queryClient.fetchQuery({
+          queryKey,
+          queryFn: () => fetchGamePackData({ gameId, url, previousState }),
+        });
 
-        if (outcome === 'not-available') {
+        if (result.status === 'not-available') {
           transitionGameNotStarted();
           return;
         }
 
-        if (outcome !== 'success') {
-          transitionGameError(result.error || new Error(`S3 fetch failed: ${result.status}`));
+        if (result.status !== 'success') {
+          transitionGameError(result.error);
           return;
         }
 
-        transitionGameSuccess(result.data);
+        applyGameDataState(result.state);
+        if (activeGameId) {
+          queryClient.setQueryData(gamePackQueryKey(activeGameId), result);
+        }
       } finally {
         completeGameLoading(showLoading);
       }
     },
     [
+      applyGameDataState,
+      awayTeamId,
+      box,
+      captions,
       completeGameLoading,
+      gameStatusMessage,
+      homeTeamId,
+      lastAction,
+      nbaGameId,
+      numPeriods,
+      playByPlay,
+      queryClient,
       transitionGameError,
       transitionGameLoading,
       transitionGameNotStarted,
-      transitionGameSuccess,
     ],
   );
 
@@ -154,6 +166,7 @@ export function useGameData() {
    * Reset loading states when game changes
    */
   const resetLoadingStates = useCallback(() => {
+    activeGameIdRef.current = null;
     setIsBoxLoading(true);
     setIsPlayLoading(true);
     setGameStatusMessage(null);

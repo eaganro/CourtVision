@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   parseGameSlug,
   scheduleMatchesDate,
   sortGamesForSelection,
 } from '../../../domain/game-selection/status';
-import { PREFIX } from '../../../environment';
-import { classifyFetchResult, fetchJson } from '../../../data/apiClient';
-import { normalizeInitPayload } from '../../../data/scheduleAdapter';
+import { fetchInitData, initQueryKey } from '../../../data/gameQueries';
 
 export function useScheduleState({
   initialDate,
@@ -17,6 +16,7 @@ export function useScheduleState({
   isScheduleLoading,
   fetchScheduleWithReason,
 }) {
+  const queryClient = useQueryClient();
   // Start null if no URL params; wait for init.json to provide the date.
   const [date, setDate] = useState(initialDate || null);
   const [isInitLoading, setIsInitLoading] = useState(!initialDate);
@@ -28,21 +28,18 @@ export function useScheduleState({
 
     const fetchInitState = async () => {
       try {
-        const result = await fetchJson(`${PREFIX}/data/init.json`);
-        const outcome = classifyFetchResult(result);
+        const normalizedInit = await queryClient.fetchQuery({
+          queryKey: initQueryKey(),
+          queryFn: () => fetchInitData({ fallbackDate }),
+        });
 
-        if (outcome === 'success') {
-          const normalizedInit = normalizeInitPayload(result.data, { fallbackDate });
-          setDate(normalizedInit.date);
-          if (normalizedInit.autoSelectGameId && !initialGameId) {
-            const slugParams = parseGameSlug(normalizedInit.autoSelectGameId);
-            if (slugParams) {
-              setGameId(slugParams.gameId);
-            }
+        setDate(normalizedInit.date);
+        if (normalizedInit.autoSelectGameId && !initialGameId) {
+          const slugParams = parseGameSlug(normalizedInit.autoSelectGameId);
+          if (slugParams) {
+            setGameId(slugParams.gameId);
           }
-          return;
         }
-        setDate(fallbackDate);
       } catch (err) {
         console.error('Init fetch failed:', err);
         setDate(fallbackDate);
@@ -52,7 +49,7 @@ export function useScheduleState({
     };
 
     fetchInitState();
-  }, [date, initialGameId, setGameId]);
+  }, [date, initialGameId, queryClient, setGameId]);
 
   useEffect(() => {
     if (date) {
